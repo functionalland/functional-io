@@ -17,7 +17,7 @@ export const connect = connection => Connection.isOrThrow(connection)
 // connectTls :: Connection a -> Task e Connection a
 export const connectTls = connection => Connection.isOrThrow(connection)
   && Task.wrap(
-    _ => Deno.connect(
+    _ => Deno.connectTls(
       {
         certFile: connection.certFile,
         hostname: connection.hostname,
