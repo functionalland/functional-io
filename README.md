@@ -1,6 +1,6 @@
 # Functional Deno IO
 
-Deno IO methods as valid Task monads perfect to write great point-free software in JavaScript that is compatible with most modern browsers and Deno.
+Deno IO methods as valid Task monads perfect to write great point-free software in JavaScript.
 
 [![deno land](http://img.shields.io/badge/available%20on-deno.land/x-lightgrey.svg?logo=deno&labelColor=black)](https://deno.land/x/functional-deno-io@v0.1.0)
 [![deno version](https://img.shields.io/badge/deno-^1.3.2-lightgrey?logo=deno)](https://github.com/denoland/deno)
@@ -23,8 +23,7 @@ import { close, copyFile, create } from "https://deno.land/x/functional_io@v0.2.
 
 const writeNewFile = curry(
   (buffer, destinationFile) =>
-    File.isOrThrow(sourceFile)
-    && File.isOrThrow(destinationFile)
+    File.isOrThrow(destinationFile)
     && compose(
       chain(close),
       chain(writeAll(buffer)),
@@ -59,7 +58,7 @@ are no longer pure.
 The `Buffer` type represents a data buffer.
 
 ```js
-import { BUffer } from "https://deno.land/x/functional_io@v0.2.0/types.js";
+import { Buffer } from "https://deno.land/x/functional_io@v0.2.0/types.js";
 
 const container = Buffer(new Uint8Array([ 65, 66, 67, 68, 69 ]));
 ```
