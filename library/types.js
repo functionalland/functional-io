@@ -1,5 +1,5 @@
 import { factorizeType } from "https://deno.land/x/functional@v0.4.2/SumType.js";
-import Task from "../../functional/library/Task.js"
+import Task from "https://deno.land/x/functional@v0.4.2/Task.js"
 
 const $$value = Symbol.for("TypeValue");
 
