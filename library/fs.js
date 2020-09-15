@@ -3,14 +3,12 @@ import {
   ensureDir as _ensureDir,
   ensureSymlink as _ensureSymlink,
   exists as _exists,
-  move as _move,
-  readJson as _readJson,
-  writeJson as _writeJson,
-} from "https://deno.land/std@0.67.0/fs/mod.ts";
+  move as _move
+} from "https://deno.land/std@0.69.0/fs/mod.ts";
 import { curry } from "https://x.nest.land/ramda@0.27.0/source/index.js";
 import Either from "https://deno.land/x/functional@v0.5.2/Either.js"
 import Task from "https://deno.land/x/functional@v0.5.2/Task.js"
-import { Buffer, Directory, File, Resource } from "./types.js";
+import { Buffer, coerceAsReader, coerceAsWriter, Directory, File, Resource } from "./types.js";
 
 // chdir :: Directory a -> Task e Directory a
 export const chdir = directory => Directory.isOrThrow(directory)
@@ -35,11 +33,10 @@ export const close = file => File.isOrThrow(file)
   && Task.wrap(_ => Deno.close(file.rid) || Promise.resolve(undefined))
     .map(_ => File(file.path, file.raw, file.rid));
 
-// copy :: Options -> Buffer a -> Buffer b -> Task e Writer b
+// copy :: Options -> Buffer a -> Buffer b -> Task e Buffer a
 export const copy = curry(
   (options, readerBuffer, writerBuffer) => (Buffer.isOrThrow(readerBuffer) && Buffer.isOrThrow(writerBuffer))
-    && Task.wrap(_ => Deno.copy(new Deno.Buffer(readerBuffer.raw), new Deno.Buffer(writerBuffer.raw), options))
-      .map(_ => Buffer(readerBuffer.raw))
+    && Task.of(writerBuffer.constructor.from({ ...writerBuffer, raw: readerBuffer.raw }))
 );
 
 // copyFile :: File a -> File b -> Task e File b
@@ -122,7 +119,7 @@ export const read = resource => {
 
 // readAll :: Resource a -> Task e Resource a
 export const readAll = resource => Resource.isOrThrow(resource)
-  && Task.wrap(_ => Deno.readAll(resource))
+  && Task.wrap(_ => Deno.readAll(coerceAsReader(resource)))
     .map(_buffer => resource.constructor.from({ ...resource, raw: _buffer }));
 
 // readFile :: File a -> Task e File a
@@ -144,10 +141,6 @@ export const rename = curry(
       .map(_ => location.constructor.from({ ...location, path: destinationPath }))
 );
 
-// readJson :: String -> Task e Object
-export const readJson = filePath => Task.wrap(_ => _readJson(filePath))
-  .map(JSONObject => ({ ...JSONObject }));
-
 // write :: Resource a -> Task e Resource a
 export const write = resource => Resource.isOrThrow(resource)
   && Task.wrap(_ => Deno.write(resource.rid, resource.raw))
@@ -157,7 +150,7 @@ export const write = resource => Resource.isOrThrow(resource)
 export const writeAll = curry(
   (buffer, resource) => Resource.isOrThrow(resource) && Buffer.isOrThrow(buffer)
     && Task.wrap(_ =>
-      Deno.writeAll(resource, buffer.raw))
+      Deno.writeAll(coerceAsWriter(resource), buffer.raw))
       .map(_ => resource.constructor.from({ ...resource, raw: buffer.raw }))
 );
 
@@ -166,10 +159,4 @@ export const writeFile = curry(
   (options, file) => Resource.isOrThrow(file)
     && Task.wrap(_ => Deno.writeFile(file.path, file.raw, options))
       .map(_ => file.constructor.from({ ...file }))
-);
-
-// writeJson :: Options -> String -> Object -> Task e Object
-export const writeJson = curry(
-  (options, filePath, JSONObject) => Task.wrap(_ => _writeJson(filePath, JSONObject, options))
-    .map(_ => ({ ...JSONObject }))
 );

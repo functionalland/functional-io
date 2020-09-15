@@ -127,7 +127,7 @@ assert(Task.is(container));
 
 Changes the permission of a specific file/directory of specified path. Ignores the process's umask.  
 
-`chmod :: Number -> File a -> Task e File a`
+`chmod :: Number -> Location a -> Task e Location a`
 
 ```js
 import { chmod } from "https://deno.land/x/functional_io@v0.2.0/fs.js";
@@ -143,7 +143,7 @@ assert(Task.is(container));
 
 Change owner of a regular file or directory. This functionality is not available on Windows.
 
-`chown :: Number -> Number -> File a -> Task e File a`
+`chown :: Number -> Number -> Location a -> Task e Location a`
 
 ```js
 import { chown } from "https://deno.land/x/functional_io@v0.2.0/fs.js";
@@ -160,7 +160,7 @@ assert(Task.is(container));
 Close the given resource which has been previously opened, such as via opening or creating a file. 
 Closing a file when you are finished with it is important to avoid leaking resources.  
 
-`copy :: File a -> Task e File a`
+`close :: File a -> Task e File a`
 
 ```js
 import { close } from "https://deno.land/x/functional_io@v0.2.0/fs.js";
@@ -176,7 +176,7 @@ assert(Task.is(container));
 
 Copies from a source to a destination until either EOF (null) is read from the source, or an error occurs. 
 
-`copy :: Options -> Buffer a -> Buffer b -> Task e Writer b`
+`copy :: Options -> Buffer a -> Buffer b -> Task e Buffer a`
 
 ```js
 import { copy } from "https://deno.land/x/functional_io@v0.2.0/fs.js";

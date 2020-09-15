@@ -1,5 +1,5 @@
-import { factorizeType } from "https://deno.land/x/functional@v0.4.2/SumType.js";
-import Task from "https://deno.land/x/functional@v0.4.2/Task.js"
+import { factorizeType } from "https://deno.land/x/functional@v0.5.2/SumType.js";
+import Task from "https://deno.land/x/functional@v0.5.2/Task.js"
 
 const $$value = Symbol.for("TypeValue");
 
@@ -18,28 +18,6 @@ Buffer.of = buffer => Buffer(buffer);
 Buffer.prototype.map = Buffer.prototype["fantasy-land/map"] = function (unaryFunction) {
 
   return Buffer(unaryFunction(this.raw));
-};
-
-// read :: Buffer a ~> Buffer a -> Task e Buffer a
-Buffer.prototype.read = function (buffer) {
-
-  return Task.wrap(_ => new Deno.Buffer(...this.raw).read(buffer))
-    .map(
-      byteCount => byteCount > 0
-        ? Buffer(new Uint8Array([ ...buffer ]))
-        : Buffer(new Uint8Array([]))
-    );
-};
-
-// write :: Buffer a ~> Buffer a -> Task e Buffer a
-Buffer.prototype.write = function (buffer) {
-
-  return Task.wrap(_ => new Deno.Buffer(...this.raw).write(buffer))
-    .map(
-      byteCount => byteCount > 0
-        ? Buffer(new Uint8Array([ ...this.raw, ...buffer ]))
-        : Buffer(new Uint8Array([]))
-    );
 };
 
 export const Directory = factorizeType("Directory", [ "path" ]);
@@ -81,27 +59,13 @@ File.empty = File.prototype.empty = File.prototype["fantasy-land/empty"] = () =>
 // chain :: File a ~> (a -> File b) -> File b
 File.prototype.chain = File.prototype["fantasy-land/chain"] = function (unaryFunction) {
 
-  return unaryFunction(this.path, this.raw);
+  return unaryFunction(this.raw);
 };
 
 // map :: File a ~> (a -> b) -> File b
 File.prototype.map = File.prototype["fantasy-land/map"] = function (unaryFunction) {
 
-  return File(unaryFunction(this.path), this.raw);
-};
-
-// read :: File a ~> Buffer a -> Task e Buffer a
-File.prototype.read = function (buffer) {
-  if (this.rid <= 1) throw new Error(`Can't read from resource with ID "${this.rid}" as it's not a File.`);
-
-  return Deno.read(this.rid, buffer);
-};
-
-// write :: File a ~> Buffer a -> Task e File a
-File.prototype.write = function (buffer) {
-  if (this.rid <= 1) throw new Error(`Can't write to resource with ID "${this.rid}" as it's not a File.`);
-
-  return Deno.write(this.rid, buffer);
+  return File(this.path, unaryFunction(this.raw), this.rid);
 };
 
 export const FileSystemCollection = factorizeType("FileSystemCollection", [ $$value ]);
@@ -162,16 +126,37 @@ Resource.prototype.map = Resource.prototype["fantasy-land/map"] = function (unar
   return Resource(unaryFunction(this.path), this.raw);
 };
 
-// read :: Resource a ~> Buffer a -> Task e Buffer a
-Resource.prototype.read = function (buffer) {
-  if (this.rid <= 1) throw new Error(`Can't read from resource with ID "${this.rid}" as it's not a Resource.`);
+export const coerceAsReader = resource => {
 
-  return Deno.read(this.rid, buffer);
+  return {
+    read(_array) {
+      if (resource.hasOwnProperty("rid")) return Deno.read(resource.rid, _array);
+
+      let index = 0;
+
+      for (; index < _array.length; index++) {
+        if (resource.raw.length > index) {
+          _array[index] = resource.raw[index];
+          resource.raw[index] = 0;
+        }
+      }
+
+      return Promise.resolve(index);
+    },
+    ...resource
+  };
 };
 
-// write :: Resource a ~> Buffer a -> Task e Resource a
-Resource.prototype.write = function (buffer) {
-  if (this.rid <= 1) throw new Error(`Can't write to resource with ID "${this.rid}" as it's not a Resource.`);
+export const coerceAsWriter = resource => {
 
-  return Deno.write(this.rid, buffer);
+  return {
+    write(_array) {
+      if (resource.hasOwnProperty("rid")) return Deno.write(resource.rid, _array);
+
+      resource.raw = new Uint8Array([ ...resource.raw, ..._array ]);
+
+      return Promise.resolve(_array.length);
+    },
+    ...resource
+  };
 };

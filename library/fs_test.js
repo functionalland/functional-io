@@ -1,9 +1,20 @@
-import { compose, chain, curry } from "https://x.nest.land/ramda@0.27.0/source/index.js";
+import {
+  compose,
+  converge,
+  chain,
+  curry,
+  join,
+  lift,
+  map,
+  match,
+  replace,
+  trim
+} from "https://x.nest.land/ramda@0.27.0/source/index.js";
 import { assert, assertEquals } from "https://deno.land/std@0.65.0/testing/asserts.ts";
 import {
   emptyDir as _emptyDir,
   ensureDir as _ensureDir
-} from "https://deno.land/std@0.67.0/fs/mod.ts";
+} from "https://deno.land/std@0.69.0/fs/mod.ts";
 import Either from "https://deno.land/x/functional@v0.5.2/Either.js"
 import Task from "https://deno.land/x/functional@v0.5.2/Task.js"
 import {
@@ -710,6 +721,8 @@ Deno.test(
   }
 );
 
+
+
 Deno.test(
   "Scenario 1",
   async () => {
@@ -727,12 +740,78 @@ Deno.test(
       Task.is(writeNewFile(File.fromPath(`${Deno.cwd()}/dump/hoge`), Buffer.fromString("Hello Deno")))
     );
 
-    return writeNewFile(File.fromPath(`${Deno.cwd()}/dump/hoge`), Buffer.fromString("Hello Deno")).run()
-      .then(container => {
-        assert(Either.Right.is(container));
-        assert(
-          container.toString() === `Either.Right(File("${Deno.cwd()}/dump/hoge", 72,101,108,108,111,32,68,101,110,111, 31))`
-        );
-      });
+    const container = await writeNewFile(
+      File.fromPath(`${Deno.cwd()}/dump/hoge`),
+      Buffer.fromString("Hello Deno")
+    )
+      .run();
+
+    assert(Either.Right.is(container));
+    assert(
+      container.toString() === `Either.Right(File("${Deno.cwd()}/dump/hoge", 72,101,108,108,111,32,68,101,110,111, 31))`
+    );
+
+    await Deno.remove(`${Deno.cwd()}/dump/hoge`);
+  }
+);
+
+Deno.test(
+  "Scenario 2",
+  async () => {
+    await Deno.copyFile(`${Deno.cwd()}/library/fs.js`, `${Deno.cwd()}/dump/fs.js`);
+
+    const serializeBuffer = buffer => new TextDecoder().decode(buffer);
+    const deserializeBuffer = text => new TextEncoder().encode(text);
+
+    const extractFunctionHeaders = compose(
+      chain(
+        chain(
+          writeFile({})
+        )
+      ),
+      converge(
+        lift(copy({})),
+        [
+          compose(
+            map(
+              map(
+                compose(
+                  deserializeBuffer,
+                  join("\n\n"),
+                  map(
+                    compose(
+                      header => `\`${header}\``,
+                      replace(/\/\/\s*/, ""),
+                      trim
+                    )
+                  ),
+                  match(/(?:\/\/\s*)([A-Za-z]+\s*::.*?)(?:\n)/g),
+                  serializeBuffer
+                )
+              )
+            ),
+            readFile,
+            File.fromPath,
+          ),
+          compose(
+            Task.of,
+            File.fromPath,
+            replace(/\.(js|ts)$/, ".md")
+          )
+        ]
+      )
+    );
+
+    assert(Task.is(extractFunctionHeaders(`${Deno.cwd()}/dump/fs.js`)));
+
+    const container = await extractFunctionHeaders(`${Deno.cwd()}/dump/fs.js`).run();
+
+    assert(Either.Right.is(container));
+
+    const { isFile } = await Deno.lstat(`${Deno.cwd()}/dump/fs.md`);
+    assert(isFile);
+
+    await Deno.remove(`${Deno.cwd()}/dump/fs.js`);
+    await Deno.remove(`${Deno.cwd()}/dump/fs.md`);
   }
 );
