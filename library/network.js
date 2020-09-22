@@ -1,5 +1,5 @@
 import { Connection } from "./types.js";
-import Task from "../../functional/library/Task";
+import Task from "https://deno.land/x/functional@v0.5.4/Task";
 
 // connect :: Connection a -> Task e Connection a
 export const connect = connection => Connection.isOrThrow(connection)

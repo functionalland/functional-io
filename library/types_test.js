@@ -1,6 +1,351 @@
-import { assertEquals } from "https://deno.land/std@0.65.0/testing/asserts.ts";
+import { assert, assertEquals } from "https://deno.land/std@0.70.0/testing/asserts.ts";
 
-import { Buffer, coerceAsReader, coerceAsWriter } from "./types.js";
+import { Buffer, Directory, File, coerceAsReader, coerceAsWriter, Resource } from "./types.js";
+
+Deno.test(
+  "Buffer: #ap - Composition",
+  () => {
+    const containerA = Buffer(new Uint8Array([ 65, 66, 67, 68, 69 ]));
+    const containerB = Buffer(x => new Uint8Array(x.map(x => x + 2)));
+    const containerC = Buffer(x => new Uint8Array(x.map(x => x * 2)));
+
+    assertEquals(
+      containerA.ap(containerB.ap(containerC.map(a => b => c => a(b(c))))).toString(),
+      containerA.ap(containerB).ap(containerC).toString()
+    );
+  }
+);
+
+Deno.test(
+  "Buffer: #ap with lift",
+  () => {
+    const lift2 = (f, a, b) => b.ap(a.map(f));
+
+    const containerA = Buffer(new Uint8Array([ 65, 66, 67, 68, 69 ]));
+    const containerB = Buffer(new Uint8Array([ 70, 71, 72, 73, 74 ]));
+
+    assertEquals(
+      lift2(x => y => new Uint8Array([ ...x, ...y ]), containerA, containerB).toString(),
+      Buffer(new Uint8Array([ 65, 66, 67, 68, 69, 70, 71, 72, 73, 74 ])).toString()
+    );
+  }
+);
+
+Deno.test(
+  "Buffer: #chain - Associativity",
+  async () => {
+    const container = Buffer(new Uint8Array([ 65, 66, 67, 68, 69 ]));
+    const f = x => Buffer(new Uint8Array(x.map(x => x + 2)));
+    const g = x => Buffer(new Uint8Array(x.map(x => x * 2)));
+
+    assertEquals(
+      container.chain(f).chain(g).toString(),
+      container.chain(value => f(value).chain(g)).toString()
+    );
+  }
+);
+
+Deno.test(
+  "Buffer: #concat - Associativity",
+  () => {
+    const containerA = Buffer(new Uint8Array([ 65, 66, 67, 68, 69 ]));
+    const containerB = Buffer(new Uint8Array([ 70, 71, 72, 73, 74 ]));
+    const containerC = Buffer(new Uint8Array([ 75, 76, 77, 78, 79 ]));
+
+    assertEquals(
+      containerA.concat(containerB).concat(containerC).toString(),
+      containerA.concat(containerB.concat(containerC)).toString()
+    );
+  }
+);
+
+Deno.test(
+  "Buffer: #empty - Right identity",
+  () => {
+    const container = Buffer(new Uint8Array([ 65, 66, 67, 68, 69 ]));
+
+    assertEquals(
+      container.concat(container.empty()).toString(),
+      container.toString()
+    );
+  }
+);
+
+Deno.test(
+  "Buffer: #empty - Left identity",
+  () => {
+    const container = Buffer(new Uint8Array([ 65, 66, 67, 68, 69 ]));
+
+    assertEquals(
+      container.empty().concat(container).toString(),
+      container.toString()
+    );
+  }
+);
+
+Deno.test(
+  "Buffer: #map - Identity",
+  () => {
+    const container = Buffer(new Uint8Array([ 65, 66, 67, 68, 69 ]));
+
+    assertEquals(
+      container.map(x => x).toString(),
+      container.toString()
+    );
+  }
+);
+
+Deno.test(
+  "Buffer: #map - Composition",
+  () => {
+    const container = Buffer(new Uint8Array([ 65, 66, 67, 68, 69 ]));
+    const f = x => new Uint8Array(x.map(x => x + 2));
+    const g = x => new Uint8Array(x.map(x => x * 2));
+
+    assertEquals(
+      container.map(f).map(g).toString(),
+      container.map(x => g(f(x))).toString()
+    );
+  }
+);
+
+Deno.test(
+  "Directory: #chain - Associativity",
+  async () => {
+    const container = Directory(`${Deno.cwd()}/hoge`);
+    const f = x => Directory(x.replace("hoge", "piyo"));
+    const g = x => Directory(x.replace("piyo", "fuga"));
+
+    assertEquals(
+      container.chain(f).chain(g).toString(),
+      container.chain(value => f(value).chain(g)).toString()
+    );
+  }
+);
+
+Deno.test(
+  "Directory: #equals - Reflexivity",
+  () =>
+    assert(
+      Directory(`${Deno.cwd()}/hoge`).equals(Directory(`${Deno.cwd()}/hoge`))
+    )
+);
+
+Deno.test(
+  "Directory: #equals - Symmetry",
+  () => {
+    const containerA = Directory(`${Deno.cwd()}/hoge`);
+    const containerB = Directory(`${Deno.cwd()}/hoge`);
+
+    assert(containerA.equals(containerB) === containerB.equals(containerA));
+  }
+);
+
+Deno.test(
+  "Directory: #equals - Transitivity",
+  () => {
+    const containerA = Directory(`${Deno.cwd()}/hoge`);
+    const containerB = Directory(`${Deno.cwd()}/hoge`);
+    const containerC = Directory(`${Deno.cwd()}/hoge`);
+
+    assert(
+      containerA.equals(containerB)
+      === containerB.equals(containerC)
+      === containerA.equals(containerC)
+    )
+  }
+);
+
+Deno.test(
+  "Directory: #map - Identity",
+  () => {
+    const container = Directory(`${Deno.cwd()}/hoge`);
+
+    assertEquals(
+      container.map(x => x).toString(),
+      container.toString()
+    );
+  }
+);
+
+Deno.test(
+  "Directory: #map - Composition",
+  () => {
+    const container = Directory(`${Deno.cwd()}/hoge`);
+    const f = x => x.replace("hoge", "piyo");
+    const g = x => x.replace("piyo", "fuga");
+
+    assertEquals(
+      container.map(f).map(g).toString(),
+      container.map(x => g(f(x))).toString()
+    );
+  }
+);
+
+Deno.test(
+  "File: #ap - Composition",
+  () => {
+    const containerA = File(`${Deno.cwd()}/hoge`, new Uint8Array([ 65, 66, 67, 68, 69 ]), 3);
+    const containerB = File(`${Deno.cwd()}/hoge`, x => new Uint8Array(x.map(x => x + 2)), 3);
+    const containerC = File(`${Deno.cwd()}/hoge`, x => new Uint8Array(x.map(x => x * 2)), 3);
+
+    assertEquals(
+      containerA.ap(containerB.ap(containerC.map(a => b => c => a(b(c))))).toString(),
+      containerA.ap(containerB).ap(containerC).toString()
+    );
+  }
+);
+
+Deno.test(
+  "File: #ap with lift",
+  () => {
+    const lift2 = (f, a, b) => b.ap(a.map(f));
+
+    const containerA = File(`${Deno.cwd()}/hoge`, new Uint8Array([ 65, 66, 67, 68, 69 ]), 3);
+    const containerB = File(`${Deno.cwd()}/piyo`, new Uint8Array([ 70, 71, 72, 73, 74 ]), 4);
+
+    assertEquals(
+      lift2(x => y => new Uint8Array([ ...x, ...y ]), containerA, containerB).toString(),
+      File(`${Deno.cwd()}/piyo`, new Uint8Array([ 65, 66, 67, 68, 69, 70, 71, 72, 73, 74 ]), 4).toString()
+    );
+  }
+);
+
+Deno.test(
+  "File: #bimap - Identity",
+  () => {
+    const container = File(`${Deno.cwd()}/hoge`, new Uint8Array([ 65, 66, 67, 68, 69 ]), 3);
+
+    assertEquals(
+      container.bimap(x => x, x => x).toString(),
+      container.toString()
+    );
+  }
+);
+
+Deno.test(
+  "File: #bimap - Composition",
+  () => {
+    const container = File(`${Deno.cwd()}/hoge`, new Uint8Array([ 65, 66, 67, 68, 69 ]), 3);
+    const f = x => new Uint8Array(x.map(x => x + 2));
+    const g = x => x + 1;
+    const h = x => new Uint8Array(x.map(x => x * 2));
+    const i = x => x * 0;
+
+    assertEquals(
+      container.bimap(f, g).bimap(h, i).toString(),
+      container.bimap(x => h(f(x)), y => i(g(y))).toString()
+    );
+  }
+);
+
+Deno.test(
+  "File: #chain - Associativity",
+  async () => {
+    const container = File(`${Deno.cwd()}/hoge`, new Uint8Array([ 65, 66, 67, 68, 69 ]), 3);
+    const f = x => File(`${Deno.cwd()}/hoge`, new Uint8Array(x.map(x => x + 2)), 3);
+    const g = x => File(`${Deno.cwd()}/hoge`, new Uint8Array(x.map(x => x * 2)), 3);
+
+    assertEquals(
+      container.chain(f).chain(g).toString(),
+      container.chain(value => f(value).chain(g)).toString()
+    );
+  }
+);
+
+Deno.test(
+  "File: #concat - Associativity",
+  () => {
+    const containerA = File(`${Deno.cwd()}/hoge`, new Uint8Array([ 65, 66, 67, 68, 69 ]), 3);
+    const containerB = File(`${Deno.cwd()}/hoge`, new Uint8Array([ 70, 71, 72, 73, 74 ]), 3);
+    const containerC = File(`${Deno.cwd()}/hoge`, new Uint8Array([ 75, 76, 77, 78, 79 ]), 3);
+
+    assertEquals(
+      containerA.concat(containerB).concat(containerC).toString(),
+      containerA.concat(containerB.concat(containerC)).toString()
+    );
+  }
+);
+
+Deno.test(
+  "File: #extend - Associativity",
+  async () => {
+    const container = File(`${Deno.cwd()}/hoge`, new Uint8Array([ 65, 66, 67, 68, 69 ]), 3);
+    const f = container => new Uint8Array(container.raw.map(x => x + 2));
+    const g = container => new Uint8Array(container.raw.map(x => x * 2));
+
+    assertEquals(
+      container.extend(f).extend(g).toString(),
+      container.extend(value => g(value.extend(f))).toString()
+    );
+  }
+);
+
+Deno.test(
+  "File: #map - Identity",
+  () => {
+    const container = File(`${Deno.cwd()}/hoge`, new Uint8Array([ 65, 66, 67, 68, 69 ]), 3);
+
+    assertEquals(
+      container.map(x => x).toString(),
+      container.toString()
+    );
+  }
+);
+
+Deno.test(
+  "File: #map - Composition",
+  () => {
+    const container = File(`${Deno.cwd()}/hoge`, new Uint8Array([ 65, 66, 67, 68, 69 ]), 3);
+    const f = x => new Uint8Array(x.map(x => x + 2));
+    const g = x => new Uint8Array(x.map(x => x * 2));
+
+    assertEquals(
+      container.map(f).map(g).toString(),
+      container.map(x => g(f(x))).toString()
+    );
+  }
+);
+
+Deno.test(
+  "Resource: #chain - Associativity",
+  async () => {
+    const container = Resource(new Uint8Array([ 65, 66, 67, 68, 69 ]), 3);
+    const f = x => Resource(new Uint8Array(x.map(x => x + 2)), 3);
+    const g = x => Resource(new Uint8Array(x.map(x => x * 2)), 3);
+
+    assertEquals(
+      container.chain(f).chain(g).toString(),
+      container.chain(value => f(value).chain(g)).toString()
+    );
+  }
+);
+
+Deno.test(
+  "Resource: #map - Identity",
+  () => {
+    const container = Resource(new Uint8Array([ 65, 66, 67, 68, 69 ]), 3);
+
+    assertEquals(
+      container.map(x => x).toString(),
+      container.toString()
+    );
+  }
+);
+
+Deno.test(
+  "Resource: #map - Composition",
+  () => {
+    const container = Resource(new Uint8Array([ 65, 66, 67, 68, 69 ]), 3);
+    const f = x => new Uint8Array(x.map(x => x + 2));
+    const g = x => new Uint8Array(x.map(x => x * 2));
+
+    assertEquals(
+      container.map(f).map(g).toString(),
+      container.map(x => g(f(x))).toString()
+    );
+  }
+);
 
 Deno.test(
   "coerceAsReader",

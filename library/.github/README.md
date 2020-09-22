@@ -14,8 +14,8 @@ the [Fantasy-land specifications](https://github.com/fantasyland/fantasy-land).
 
 ```js
 import { compose, chain, curry } from "https://x.nest.land/ramda@0.27.0/source/index.js";
-import Either from "https://deno.land/x/functional@v0.5.2/Either.js";
-import Task from "https://deno.land/x/functional@v0.5.2/Task.js";
+import Either from "https://deno.land/x/functional@v0.5.4/Either.js";
+import Task from "https://deno.land/x/functional@v0.5.4/Task.js";
 import { Buffer, File } from "https://deno.land/x/functional_io@v0.2.0/types.js";
 import { close, writeAll, create } from "https://deno.land/x/functional_io@v0.2.0/fs.js";
 

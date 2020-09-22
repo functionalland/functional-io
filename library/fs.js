@@ -4,10 +4,10 @@ import {
   ensureSymlink as _ensureSymlink,
   exists as _exists,
   move as _move
-} from "https://deno.land/std@0.69.0/fs/mod.ts";
+} from "https://deno.land/std@0.70.0/fs/mod.ts";
 import { curry } from "https://x.nest.land/ramda@0.27.0/source/index.js";
-import Either from "https://deno.land/x/functional@v0.5.2/Either.js"
-import Task from "https://deno.land/x/functional@v0.5.2/Task.js"
+import Either from "https://deno.land/x/functional@v0.5.4/Either.js"
+import Task from "https://deno.land/x/functional@v0.5.4/Task.js"
 import { Buffer, coerceAsReader, coerceAsWriter, Directory, File, Resource } from "./types.js";
 
 // chdir :: Directory a -> Task e Directory a

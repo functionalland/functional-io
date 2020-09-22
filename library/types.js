@@ -1,7 +1,7 @@
-import { factorizeType } from "https://deno.land/x/functional@v0.5.2/SumType.js";
-import Task from "https://deno.land/x/functional@v0.5.2/Task.js"
+import { factorizeType } from "https://deno.land/x/functional@v0.5.4/SumType.js";
+import Task from "https://deno.land/x/functional@v0.5.4/Task.js";
 
-const $$value = Symbol.for("TypeValue");
+import { $$value } from "https://deno.land/x/functional@v0.5.4/Symbols.js";
 
 export const Buffer = factorizeType("Buffer", [ "raw" ]);
 
@@ -12,9 +12,28 @@ Buffer.isOrThrow = container => {
 
 Buffer.fromString = text => Buffer(new TextEncoder().encode(text));
 
-Buffer.of = buffer => Buffer(buffer);
+Buffer.of = Buffer.prototype.of = Buffer.prototype["fantasy-land/of"] = buffer => Buffer(buffer);
 
-// map :: File a ~> (a -> b) -> File b
+Buffer.prototype.ap = Buffer.prototype["fantasy-land/ap"] = function (container) {
+
+  return Buffer.of(container.raw(this.raw));
+};
+
+Buffer.prototype.chain = Buffer.prototype["fantasy-land/chain"] = function (unaryFunction) {
+
+  return unaryFunction(this.raw);
+};
+
+Buffer.prototype.concat = Buffer.prototype["fantasy-land/concat"] = function (container) {
+
+  return Buffer(new Uint8Array([ ...this.raw, ...container.raw ]));
+};
+
+Buffer.empty = Buffer.prototype.empty = Buffer.prototype["fantasy-land/empty"] = function () {
+
+  return Buffer(new Uint8Array([]));
+};
+
 Buffer.prototype.map = Buffer.prototype["fantasy-land/map"] = function (unaryFunction) {
 
   return Buffer(unaryFunction(this.raw));
@@ -27,17 +46,16 @@ Directory.isOrThrow = container => {
   else throw new Error(`Expected a Directory but got a "${typeof container}"`);
 }
 
-// equals :: Directory a ~> Directory b -> Boolean
-Directory.prototype.equals = Directory.prototype["fantasy-land/equals"] = function (container) {
-
-  return this.path === container.path;
-}
-// chain :: Directory a ~> (a -> Directory b) -> Directory b
 Directory.prototype.chain = Directory.prototype["fantasy-land/chain"] = function (unaryFunction) {
 
   return unaryFunction(this.path);
 };
-// map :: Directory a ~> (a -> b) -> Directory b
+
+Directory.prototype.equals = Directory.prototype["fantasy-land/equals"] = function (container) {
+
+  return this.path === container.path;
+}
+
 Directory.prototype.map = Directory.prototype["fantasy-land/map"] = function (unaryFunction) {
 
   return Directory(unaryFunction(this.path));
@@ -52,17 +70,44 @@ File.isOrThrow = container => {
   else throw new Error(`Expected a File but got a "${typeof container}"`);
 }
 
-// empty :: File => () -> File a
+File.prototype.ap = File.prototype["fantasy-land/ap"] = function (container) {
+
+  return File(this.path, container.raw(this.raw), this.rid);
+};
+
+File.prototype.bimap = File.prototype["fantasy-land/bimap"] = function (unaryFunctionA, unaryFunctionB) {
+
+  return File(this.path, unaryFunctionA(this.raw), unaryFunctionB(this.rid));
+};
+
 File.empty = File.prototype.empty = File.prototype["fantasy-land/empty"] = () =>
   File("", new Uint8Array([]), 0);
 
-// chain :: File a ~> (a -> File b) -> File b
 File.prototype.chain = File.prototype["fantasy-land/chain"] = function (unaryFunction) {
 
   return unaryFunction(this.raw);
 };
 
-// map :: File a ~> (a -> b) -> File b
+File.prototype.concat = File.prototype["fantasy-land/concat"] = function (container) {
+
+  return File(this.path, new Uint8Array([ ...this.raw, ...container.raw ]), this.rid);
+};
+
+File.prototype.extend = File.prototype["fantasy-land/extend"] = function (unaryFunction) {
+
+  return File(this.path, unaryFunction(this), this.rid);
+};
+
+File.empty = File.prototype.empty = Buffer.prototype["fantasy-land/empty"] = function () {
+
+  return File('', new Uint8Array([]), 0);
+};
+
+File.prototype.equals = File.prototype["fantasy-land/equals"] = function (container) {
+
+  return this.path === container.path;
+}
+
 File.prototype.map = File.prototype["fantasy-land/map"] = function (unaryFunction) {
 
   return File(this.path, unaryFunction(this.raw), this.rid);
@@ -73,10 +118,8 @@ export const FileSystemCollection = factorizeType("FileSystemCollection", [ $$va
 FileSystemCollection.of = FileSystemCollection["fantasy-land/of"] = value =>
   (value instanceof Array) ? FileSystemCollection(value) : FileSystemCollection([ value ]);
 
-// empty :: FileSystemCollection m => () -> m
 FileSystemCollection.empty = FileSystemCollection["fantasy-land/empty"] = _ => FileSystemCollection.of([]);
 
-// concat :: FileSystemCollection [a] ~> FileSystemCollection [a] -> FileSystemCollection [a]
 FileSystemCollection.prototype.concat = FileSystemCollection["fantasy-land/concat"] = function (container) {
 
   return FileSystemCollection(
@@ -91,7 +134,6 @@ FileSystemCollection.prototype.concat = FileSystemCollection["fantasy-land/conca
   );
 };
 
-// map :: FileSystemCollection [a] ~> (a -> b) -> FileSystemCollection [b]
 FileSystemCollection.prototype.map = FileSystemCollection["fantasy-land/map"] = function (unaryFunction) {
 
   return FileSystemCollection(this[$$value].map(unaryFunction));
@@ -110,20 +152,17 @@ Resource.isOrThrow = container => {
   else throw new Error(`Expected a Resource but got a "${typeof container}"`);
 }
 
-// empty :: Resource => () -> Resource a
 Resource.empty = Resource.prototype.empty = Resource.prototype["fantasy-land/empty"] = () =>
   Resource("", new Uint8Array([]), 0);
 
-// chain :: Resource a ~> (a -> Resource b) -> Resource b
 Resource.prototype.chain = Resource.prototype["fantasy-land/chain"] = function (unaryFunction) {
 
-  return unaryFunction(this.path, this.raw);
+  return unaryFunction(this.raw);
 };
 
-// map :: Resource a ~> (a -> b) -> Resource b
 Resource.prototype.map = Resource.prototype["fantasy-land/map"] = function (unaryFunction) {
 
-  return Resource(unaryFunction(this.path), this.raw);
+  return Resource(unaryFunction(this.raw), this.rid);
 };
 
 export const coerceAsReader = resource => {

@@ -10,13 +10,13 @@ import {
   replace,
   trim
 } from "https://x.nest.land/ramda@0.27.0/source/index.js";
-import { assert, assertEquals } from "https://deno.land/std@0.65.0/testing/asserts.ts";
+import { assert, assertEquals } from "https://deno.land/std@0.70.0/testing/asserts.ts";
 import {
   emptyDir as _emptyDir,
   ensureDir as _ensureDir
-} from "https://deno.land/std@0.69.0/fs/mod.ts";
-import Either from "https://deno.land/x/functional@v0.5.2/Either.js"
-import Task from "https://deno.land/x/functional@v0.5.2/Task.js"
+} from "https://deno.land/std@0.70.0/fs/mod.ts";
+import Either from "https://deno.land/x/functional@v0.5.4/Either.js"
+import Task from "https://deno.land/x/functional@v0.5.4/Task.js"
 import {
   chdir,
   chmod,
@@ -43,7 +43,7 @@ import {
 } from "../library/fs.js"
 import { Buffer, Directory, File } from "../library/types.js";
 
-const $$value = Symbol.for("TypeValue");
+import { $$value } from "https://deno.land/x/functional@v0.5.4/Symbols.js";
 
 Deno.test(
   "Integration: chdir",
