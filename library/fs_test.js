@@ -1,8 +1,10 @@
 import {
   compose,
+  concat,
   converge,
   chain,
   curry,
+  flip,
   join,
   lift,
   map,
@@ -747,8 +749,9 @@ Deno.test(
       .run();
 
     assert(Either.Right.is(container));
-    assert(
-      container.toString() === `Either.Right(File("${Deno.cwd()}/dump/hoge", 72,101,108,108,111,32,68,101,110,111, 31))`
+    assertEquals(
+      container.toString(),
+      `Either.Right(File("${Deno.cwd()}/dump/hoge", 72,101,108,108,111,32,68,101,110,111, ${container[$$value].rid}))`
     );
 
     await Deno.remove(`${Deno.cwd()}/dump/hoge`);
@@ -815,3 +818,25 @@ Deno.test(
     await Deno.remove(`${Deno.cwd()}/dump/fs.md`);
   }
 );
+
+Deno.test(
+  "Scenario 3",
+  async () => {
+    const copyFile = lift(flip(concat));
+
+    const containerA = copyFile(
+      Task.of(File(`${Deno.cwd()}/dump/hoge`, new Uint8Array([ 65, 66, 67, 68, 69 ]), 3)),
+      Task.of(File(`${Deno.cwd()}/dump/piyo`, new Uint8Array([]), 4))
+    );
+
+    assert(Task.is(containerA));
+
+    const containerB = await containerA.run();
+
+    assertEquals(
+      containerB.toString(),
+      `Either.Right(File("${Deno.cwd()}/dump/piyo", 65,66,67,68,69, 4))`
+    );
+  }
+);
+

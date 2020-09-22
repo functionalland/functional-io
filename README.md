@@ -2,7 +2,7 @@
 
 Deno IO methods as valid Task monads perfect to write great point-free software in JavaScript.
 
-[![deno land](http://img.shields.io/badge/available%20on-deno.land/x-lightgrey.svg?logo=deno&labelColor=black)](https://deno.land/x/functional-deno-io@v0.1.0)
+[![deno land](http://img.shields.io/badge/available%20on-deno.land/x-lightgrey.svg?logo=deno&labelColor=black)](https://deno.land/x/functional-deno-io@v0.3.2)
 [![deno version](https://img.shields.io/badge/deno-^1.3.2-lightgrey?logo=deno)](https://github.com/denoland/deno)
 [![GitHub release](https://img.shields.io/github/v/release/sebastienfilion/functional-deno-io)](https://github.com/sebastienfilion/functional-deno-io/releases)
 [![GitHub licence](https://img.shields.io/github/license/sebastienfilion/functional-deno-io)](https://github.com/sebastienfilion/functional-deno-io/blob/v0.1.0/LICENSE)
@@ -11,15 +11,15 @@ Deno IO methods as valid Task monads perfect to write great point-free software 
   
 # Usage
 
-This example uses the [Ramda library](https://ramdajs.com) - for simplification - but you should be able to use any library that implements
-the [Fantasy-land specifications](https://github.com/fantasyland/fantasy-land). 
+This example uses the [Ramda library](https://ramdajs.com) - for simplification - but you should be able to use any 
+library that implements the [Fantasy-land specifications](https://github.com/fantasyland/fantasy-land). 
 
 ```js
 import { compose, chain, curry } from "https://x.nest.land/ramda@0.27.0/source/index.js";
 import Either from "https://deno.land/x/functional@v0.5.4/Either.js";
 import Task from "https://deno.land/x/functional@v0.5.4/Task.js";
-import { Buffer, File } from "https://deno.land/x/functional_io@v0.2.0/types.js";
-import { close, writeAll, create } from "https://deno.land/x/functional_io@v0.2.0/fs.js";
+import { Buffer, File } from "https://deno.land/x/functional_io@v0.3.2/types.js";
+import { close, writeAll, create } from "https://deno.land/x/functional_io@v0.3.2/fs.js";
 
 const writeNewFile = curry(
   (buffer, destinationFile) =>
@@ -58,7 +58,7 @@ are no longer pure.
 The `Buffer` type represents a data buffer.
 
 ```js
-import { Buffer } from "https://deno.land/x/functional_io@v0.2.0/types.js";
+import { Buffer } from "https://deno.land/x/functional_io@v0.3.2/types.js";
 
 const container = Buffer(new Uint8Array([ 65, 66, 67, 68, 69 ]));
 ```
@@ -71,7 +71,8 @@ The method creates a `Buffer` from a string.
 const container = Buffer.fromString("ABCDE");
 ```
 
-This implementation of Buffer is a valid [`Functor`](https://github.com/fantasyland/fantasy-land#functor).
+This implementation of Buffer is a valid [`Setoid`](https://github.com/fantasyland/fantasy-land#setoid) and
+[`Functor`](https://github.com/fantasyland/fantasy-land#functor).
 
 ### `Directory` type
 
@@ -82,12 +83,13 @@ It's only property is its path.
 A Directory is a valid Location.
 
 ```js
-import { Directory } from "https://deno.land/x/functional_io@v0.2.0/types.js";
+import { Directory } from "https://deno.land/x/functional_io@v0.3.2/types.js";
 
 const container = Directory(`${Deno.cwd()}/hoge`);
 ```
 
-This implementation of Directory is a valid [`Functor`](https://github.com/fantasyland/fantasy-land#functor) and
+This implementation of Directory is a valid [`Setoid`](https://github.com/fantasyland/fantasy-land#setoid),
+[`Functor`](https://github.com/fantasyland/fantasy-land#functor) and
 [`Monad`](https://github.com/fantasyland/fantasy-land#monad).
 
 ### `File` type
@@ -99,12 +101,14 @@ It has 3 properties: a path, a buffer and a rid.
 A File is a valid Location and Resource.
 
 ```js
-import { File } from "https://deno.land/x/functional_io@v0.2.0/types.js";
+import { File } from "https://deno.land/x/functional_io@v0.3.2/types.js";
 
 const container = File(`${Deno.cwd()}/hoge`, new Uint8Array([ 65, 66, 67, 68, 69 ]), 3);
 ```
 
-This implementation of Directory is a valid [`Functor`](https://github.com/fantasyland/fantasy-land#functor) and
+This implementation of Directory is a valid [`Setoid`](https://github.com/fantasyland/fantasy-land#setoid),
+[`Semmigroup`](https://github.com/fantasyland/fantasy-land#semigroup),
+[`Functor`](https://github.com/fantasyland/fantasy-land#functor) and
 [`Monad`](https://github.com/fantasyland/fantasy-land#monad).
 
 ### `chdir` [📕](https://doc.deno.land/builtin/stable#Deno.chdir)
@@ -114,8 +118,8 @@ Change the current working directory to the specified path.
 `chdir :: Directory a -> Task e Directory a`
 
 ```js
-import { chdir } from "https://deno.land/x/functional_io@v0.2.0/fs.js";
-import { Directory } from "https://deno.land/x/functional_io@v0.2.0/types.js";
+import { chdir } from "https://deno.land/x/functional_io@v0.3.2/fs.js";
+import { Directory } from "https://deno.land/x/functional_io@v0.3.2/types.js";
 import Task from "https://deno.land/x/functional@v0.5.4/Task.js";
 
 const container = chdir(Directory(".."));
@@ -130,8 +134,8 @@ Changes the permission of a specific file/directory of specified path. Ignores t
 `chmod :: Number -> Location a -> Task e Location a`
 
 ```js
-import { chmod } from "https://deno.land/x/functional_io@v0.2.0/fs.js";
-import { File } from "https://deno.land/x/functional_io@v0.2.0/types.js";
+import { chmod } from "https://deno.land/x/functional_io@v0.3.2/fs.js";
+import { File } from "https://deno.land/x/functional_io@v0.3.2/types.js";
 import Task from "https://deno.land/x/functional@v0.5.4/Task.js";
 
 const container = chmod(0o000, File.fromPath(`${Deno.cwd()}/hoge`));
@@ -146,8 +150,8 @@ Change owner of a regular file or directory. This functionality is not available
 `chown :: Number -> Number -> Location a -> Task e Location a`
 
 ```js
-import { chown } from "https://deno.land/x/functional_io@v0.2.0/fs.js";
-import { File } from "https://deno.land/x/functional_io@v0.2.0/types.js";
+import { chown } from "https://deno.land/x/functional_io@v0.3.2/fs.js";
+import { File } from "https://deno.land/x/functional_io@v0.3.2/types.js";
 import Task from "https://deno.land/x/functional@v0.5.4/Task.js";
 
 const container = chown(null, null, File.fromPath(`${Deno.cwd()}/hoge`));
@@ -163,8 +167,8 @@ Closing a file when you are finished with it is important to avoid leaking resou
 `close :: File a -> Task e File a`
 
 ```js
-import { close } from "https://deno.land/x/functional_io@v0.2.0/fs.js";
-import { File } from "https://deno.land/x/functional_io@v0.2.0/types.js";
+import { close } from "https://deno.land/x/functional_io@v0.3.2/fs.js";
+import { File } from "https://deno.land/x/functional_io@v0.3.2/types.js";
 import Task from "https://deno.land/x/functional@v0.5.4/Task.js";
 
 const container = close(File(`${Deno.cwd()}/hoge`, new Uint8Array([]), 3));
@@ -179,8 +183,8 @@ Copies from a source to a destination until either EOF (null) is read from the s
 `copy :: Options -> Buffer a -> Buffer b -> Task e Buffer a`
 
 ```js
-import { copy } from "https://deno.land/x/functional_io@v0.2.0/fs.js";
-import { Buffer } from "https://deno.land/x/functional_io@v0.2.0/types.js";
+import { copy } from "https://deno.land/x/functional_io@v0.3.2/fs.js";
+import { Buffer } from "https://deno.land/x/functional_io@v0.3.2/types.js";
 import Task from "https://deno.land/x/functional@v0.5.4/Task.js";
 
 const container = copy({}, Buffer(new Uint8Array([ 65, 66, 67, 68, 69 ])), Buffer(new Uint8Array([])));
@@ -196,8 +200,8 @@ else overwriting. Fails if target path is a directory or is unwritable.
 `copyFile :: File a -> File b -> Task e File b`
 
 ```js
-import { copyFile } from "https://deno.land/x/functional_io@v0.2.0/fs.js";
-import { File } from "https://deno.land/x/functional_io@v0.2.0/types.js";
+import { copyFile } from "https://deno.land/x/functional_io@v0.3.2/fs.js";
+import { File } from "https://deno.land/x/functional_io@v0.3.2/types.js";
 import Task from "https://deno.land/x/functional@v0.5.4/Task.js";
 
 const container = copyFile(File.fromPath(`${Deno.cwd()}/hoge`), File.fromPath(`${Deno.cwd()}/piyo`));
@@ -212,8 +216,8 @@ Creates a file if none exists or truncates an existing file.
 `create :: File a -> Task e File a`
 
 ```js
-import { create } from "https://deno.land/x/functional_io@v0.2.0/fs.js";
-import { File } from "https://deno.land/x/functional_io@v0.2.0/types.js";
+import { create } from "https://deno.land/x/functional_io@v0.3.2/fs.js";
+import { File } from "https://deno.land/x/functional_io@v0.3.2/types.js";
 import Task from "https://deno.land/x/functional@v0.5.4/Task.js";
 
 const container = create(File.fromPath(`${Deno.cwd()}/hoge`));
@@ -228,7 +232,7 @@ Return a Directory representation of the current working directory.
 `cwd :: () -> Task e Directory a`
 
 ```js
-import { cwd } from "https://deno.land/x/functional_io@v0.2.0/fs.js";
+import { cwd } from "https://deno.land/x/functional_io@v0.3.2/fs.js";
 import Task from "https://deno.land/x/functional@v0.5.4/Task.js";
 
 const container = cwd();
@@ -244,8 +248,8 @@ If the directory does not exist, it is created. The directory itself is not dele
 `emptyDir :: Directory a -> Task e Directory a`
 
 ```js
-import { emptyDir } from "https://deno.land/x/functional_io@v0.2.0/fs.js";
-import { Directory } from "https://deno.land/x/functional_io@v0.2.0/types.js";
+import { emptyDir } from "https://deno.land/x/functional_io@v0.3.2/fs.js";
+import { Directory } from "https://deno.land/x/functional_io@v0.3.2/types.js";
 import Task from "https://deno.land/x/functional@v0.5.4/Task.js";
 
 const container = emptyDir(Directory(`${Deno.cwd()}/hoge`));
@@ -260,8 +264,8 @@ Ensures that the directory exists. If the directory structure does not exist, it
 `ensureDir :: Directory a -> Task e Directory a`
 
 ```js
-import { ensureDir } from "https://deno.land/x/functional_io@v0.2.0/fs.js";
-import { Directory } from "https://deno.land/x/functional_io@v0.2.0/types.js";
+import { ensureDir } from "https://deno.land/x/functional_io@v0.3.2/fs.js";
+import { Directory } from "https://deno.land/x/functional_io@v0.3.2/types.js";
 import Task from "https://deno.land/x/functional@v0.5.4/Task.js";
 
 const container = emptyDir(Directory(`${Deno.cwd()}/hoge`));
@@ -277,8 +281,8 @@ If the file or directory doesn't exist, it will resolve to `Either.Left(null)`.
 `exists :: Location a -> Task null Location a`
 
 ```js
-import { exists } from "https://deno.land/x/functional_io@v0.2.0/fs.js";
-import { Directory } from "https://deno.land/x/functional_io@v0.2.0/types.js";
+import { exists } from "https://deno.land/x/functional_io@v0.3.2/fs.js";
+import { Directory } from "https://deno.land/x/functional_io@v0.3.2/types.js";
 import Task from "https://deno.land/x/functional@v0.5.4/Task.js";
 
 const container = exists(Directory(`${Deno.cwd()}/hoge`));
@@ -293,8 +297,8 @@ Creates a new directory with the specified path.
 `mkdir :: Options -> Directory a -> Task e Directory a`
 
 ```js
-import { mkdir } from "https://deno.land/x/functional_io@v0.2.0/fs.js";
-import { Directory } from "https://deno.land/x/functional_io@v0.2.0/types.js";
+import { mkdir } from "https://deno.land/x/functional_io@v0.3.2/fs.js";
+import { Directory } from "https://deno.land/x/functional_io@v0.3.2/types.js";
 import Task from "https://deno.land/x/functional@v0.5.4/Task.js";
 
 const container = mkdir({}, Directory(`${Deno.cwd()}/hoge`));
@@ -309,8 +313,8 @@ Moves a file or directory.
 `move :: Options -> String -> Location a -> Task e Location b`
 
 ```js
-import { move } from "https://deno.land/x/functional_io@v0.2.0/fs.js";
-import { Directory } from "https://deno.land/x/functional_io@v0.2.0/types.js";
+import { move } from "https://deno.land/x/functional_io@v0.3.2/fs.js";
+import { Directory } from "https://deno.land/x/functional_io@v0.3.2/types.js";
 import Task from "https://deno.land/x/functional@v0.5.4/Task.js";
 
 const container = move({}, `${Deno.cwd()}/piyo`, Directory(`${Deno.cwd()}/hoge`));
@@ -326,8 +330,8 @@ createNew open options. It is the callers responsibility to close the file when 
 `open :: Options -> File a -> Task e File a`
 
 ```js
-import { open } from "https://deno.land/x/functional_io@v0.2.0/fs.js";
-import { Directory } from "https://deno.land/x/functional_io@v0.2.0/types.js";
+import { open } from "https://deno.land/x/functional_io@v0.3.2/fs.js";
+import { Directory } from "https://deno.land/x/functional_io@v0.3.2/types.js";
 import Task from "https://deno.land/x/functional@v0.5.4/Task.js";
 
 const container = open({ read: true, write: true }, File.fromPath(`${Deno.cwd()}/hoge`));
@@ -342,8 +346,8 @@ Read from a Resource given it has a non-zero raw buffer.
 `read :: Resource a -> Task e Resource a`
 
 ```js
-import { read } from "https://deno.land/x/functional_io@v0.2.0/fs.js";
-import { File } from "https://deno.land/x/functional_io@v0.2.0/types.js";
+import { read } from "https://deno.land/x/functional_io@v0.3.2/fs.js";
+import { File } from "https://deno.land/x/functional_io@v0.3.2/types.js";
 import Task from "https://deno.land/x/functional@v0.5.4/Task.js";
 
 const container = read(File(`${Deno.cwd()}/hoge`, new Uint8Array(5), 3));
@@ -358,8 +362,8 @@ Read from a Resource.
 `readAll :: Resource a -> Task e Resource a`
 
 ```js
-import { readAll } from "https://deno.land/x/functional_io@v0.2.0/fs.js";
-import { Buffer, File } from "https://deno.land/x/functional_io@v0.2.0/types.js";
+import { readAll } from "https://deno.land/x/functional_io@v0.3.2/fs.js";
+import { Buffer, File } from "https://deno.land/x/functional_io@v0.3.2/types.js";
 import Task from "https://deno.land/x/functional@v0.5.4/Task.js";
 
 const container = readAll(File(`${Deno.cwd()}/hoge`, new Uint8Array([]), 3));
@@ -374,8 +378,8 @@ Renames a file or directory.
 `rename :: String -> Location a -> Task e Location b`
 
 ```js
-import { rename } from "https://deno.land/x/functional_io@v0.2.0/fs.js";
-import { Directory } from "https://deno.land/x/functional_io@v0.2.0/types.js";
+import { rename } from "https://deno.land/x/functional_io@v0.3.2/fs.js";
+import { Directory } from "https://deno.land/x/functional_io@v0.3.2/types.js";
 import Task from "https://deno.land/x/functional@v0.5.4/Task.js";
 
 const container = rename(`${Deno.cwd()}/piyo`, Directory(`${Deno.cwd()}/hoge`));
@@ -390,8 +394,8 @@ Write to a Resource given it has a non-zero raw buffer.
 `write :: Resource a -> Task e Resource a`
 
 ```js
-import { write } from "https://deno.land/x/functional_io@v0.2.0/fs.js";
-import { File } from "https://deno.land/x/functional_io@v0.2.0/types.js";
+import { write } from "https://deno.land/x/functional_io@v0.3.2/fs.js";
+import { File } from "https://deno.land/x/functional_io@v0.3.2/types.js";
 import Task from "https://deno.land/x/functional@v0.5.4/Task.js";
 
 const container = write(
@@ -408,8 +412,8 @@ Write all to a Resource from a Buffer.
 `writeAll :: Buffer b -> Resource a -> Task e Resource b`
 
 ```js
-import { writeAll } from "https://deno.land/x/functional_io@v0.2.0/fs.js";
-import { Buffer, File } from "https://deno.land/x/functional_io@v0.2.0/types.js";
+import { writeAll } from "https://deno.land/x/functional_io@v0.3.2/fs.js";
+import { Buffer, File } from "https://deno.land/x/functional_io@v0.3.2/types.js";
 import Task from "https://deno.land/x/functional@v0.5.4/Task.js";
 
 const container = writeAll(
@@ -427,8 +431,8 @@ Write a File to the file system.
 `writeFile :: Options -> File a -> Task e File b`
 
 ```js
-import { writeFile } from "https://deno.land/x/functional_io@v0.2.0/fs.js";
-import { Buffer, File } from "https://deno.land/x/functional_io@v0.2.0/types.js";
+import { writeFile } from "https://deno.land/x/functional_io@v0.3.2/fs.js";
+import { Buffer, File } from "https://deno.land/x/functional_io@v0.3.2/types.js";
 import Task from "https://deno.land/x/functional@v0.5.4/Task.js";
 
 const container = writeFile(

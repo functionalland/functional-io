@@ -84,6 +84,40 @@ Deno.test(
 );
 
 Deno.test(
+  "Buffer: #equals - Reflexivity",
+  () =>
+    assert(
+      Buffer(new Uint8Array([ 65, 66, 67, 68, 69 ]))
+        .equals(Buffer(new Uint8Array([ 65, 66, 67, 68, 69 ])))
+    )
+);
+
+Deno.test(
+  "Buffer: #equals - Symmetry",
+  () => {
+    const containerA = Buffer(new Uint8Array([ 65, 66, 67, 68, 69 ]));
+    const containerB = Buffer(new Uint8Array([ 65, 66, 67, 68, 69 ]));
+
+    assert(containerA.equals(containerB) === containerB.equals(containerA));
+  }
+);
+
+Deno.test(
+  "Buffer: #equals - Transitivity",
+  () => {
+    const containerA = Buffer(new Uint8Array([ 65, 66, 67, 68, 69 ]));
+    const containerB = Buffer(new Uint8Array([ 65, 66, 67, 68, 69 ]));
+    const containerC = Buffer(new Uint8Array([ 65, 66, 67, 68, 69 ]));
+
+    assert(
+      containerA.equals(containerB)
+      === containerB.equals(containerC)
+      === containerA.equals(containerC)
+    )
+  }
+);
+
+Deno.test(
   "Buffer: #map - Identity",
   () => {
     const container = Buffer(new Uint8Array([ 65, 66, 67, 68, 69 ]));
@@ -268,6 +302,40 @@ Deno.test(
 );
 
 Deno.test(
+  "File: #equals - Reflexivity",
+  () =>
+    assert(
+      File(`${Deno.cwd()}/hoge`, new Uint8Array([ 65, 66, 67, 68, 69 ]), 3)
+        .equals(File(`${Deno.cwd()}/hoge`, new Uint8Array([ 65, 66, 67, 68, 69 ]), 3))
+    )
+);
+
+Deno.test(
+  "File: #equals - Symmetry",
+  () => {
+    const containerA = File(`${Deno.cwd()}/hoge`, new Uint8Array([ 65, 66, 67, 68, 69 ]), 3);
+    const containerB = File(`${Deno.cwd()}/hoge`, new Uint8Array([ 65, 66, 67, 68, 69 ]), 3);
+
+    assert(containerA.equals(containerB) === containerB.equals(containerA));
+  }
+);
+
+Deno.test(
+  "File: #equals - Transitivity",
+  () => {
+    const containerA = File(`${Deno.cwd()}/hoge`, new Uint8Array([ 65, 66, 67, 68, 69 ]), 3);
+    const containerB = File(`${Deno.cwd()}/hoge`, new Uint8Array([ 65, 66, 67, 68, 69 ]), 3);
+    const containerC = File(`${Deno.cwd()}/hoge`, new Uint8Array([ 65, 66, 67, 68, 69 ]), 3);
+
+    assert(
+      containerA.equals(containerB)
+      === containerB.equals(containerC)
+      === containerA.equals(containerC)
+    )
+  }
+);
+
+Deno.test(
   "File: #extend - Associativity",
   async () => {
     const container = File(`${Deno.cwd()}/hoge`, new Uint8Array([ 65, 66, 67, 68, 69 ]), 3);
@@ -318,6 +386,40 @@ Deno.test(
       container.chain(f).chain(g).toString(),
       container.chain(value => f(value).chain(g)).toString()
     );
+  }
+);
+
+Deno.test(
+  "Resource: #equals - Reflexivity",
+  () =>
+    assert(
+      Resource(new Uint8Array([ 65, 66, 67, 68, 69 ]), 3)
+        .equals(Resource(new Uint8Array([ 65, 66, 67, 68, 69 ]), 3))
+    )
+);
+
+Deno.test(
+  "Resource: #equals - Symmetry",
+  () => {
+    const containerA = Resource(new Uint8Array([ 65, 66, 67, 68, 69 ]), 3);
+    const containerB = Resource(new Uint8Array([ 65, 66, 67, 68, 69 ]), 3);
+
+    assert(containerA.equals(containerB) === containerB.equals(containerA));
+  }
+);
+
+Deno.test(
+  "Resource: #equals - Transitivity",
+  () => {
+    const containerA = Resource(new Uint8Array([ 65, 66, 67, 68, 69 ]), 3);
+    const containerB = Resource(new Uint8Array([ 65, 66, 67, 68, 69 ]), 3);
+    const containerC = Resource(new Uint8Array([ 65, 66, 67, 68, 69 ]), 3);
+
+    assert(
+      containerA.equals(containerB)
+      === containerB.equals(containerC)
+      === containerA.equals(containerC)
+    )
   }
 );
 

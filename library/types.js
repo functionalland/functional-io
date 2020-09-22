@@ -34,6 +34,15 @@ Buffer.empty = Buffer.prototype.empty = Buffer.prototype["fantasy-land/empty"] =
   return Buffer(new Uint8Array([]));
 };
 
+Buffer.prototype.equals = Buffer.prototype["fantasy-land/equals"] = function (container) {
+
+  return this.raw.byteLength === container.raw.byteLength
+    && !!(this.raw.reduce(
+      (accumulator, value, index) => accumulator && accumulator[index] == value ? accumulator : false,
+      container.raw
+    ));
+};
+
 Buffer.prototype.map = Buffer.prototype["fantasy-land/map"] = function (unaryFunction) {
 
   return Buffer(unaryFunction(this.raw));
@@ -93,11 +102,6 @@ File.prototype.concat = File.prototype["fantasy-land/concat"] = function (contai
   return File(this.path, new Uint8Array([ ...this.raw, ...container.raw ]), this.rid);
 };
 
-File.prototype.extend = File.prototype["fantasy-land/extend"] = function (unaryFunction) {
-
-  return File(this.path, unaryFunction(this), this.rid);
-};
-
 File.empty = File.prototype.empty = Buffer.prototype["fantasy-land/empty"] = function () {
 
   return File('', new Uint8Array([]), 0);
@@ -105,8 +109,19 @@ File.empty = File.prototype.empty = Buffer.prototype["fantasy-land/empty"] = fun
 
 File.prototype.equals = File.prototype["fantasy-land/equals"] = function (container) {
 
-  return this.path === container.path;
-}
+  return this.path === container.path
+    && this.rid === container.rid
+    && this.raw.byteLength === container.raw.byteLength
+    && !!(this.raw.reduce(
+      (accumulator, value, index) => accumulator && accumulator[index] == value ? accumulator : false,
+      container.raw
+    ));
+};
+
+File.prototype.extend = File.prototype["fantasy-land/extend"] = function (unaryFunction) {
+
+  return File(this.path, unaryFunction(this), this.rid);
+};
 
 File.prototype.map = File.prototype["fantasy-land/map"] = function (unaryFunction) {
 
@@ -154,6 +169,16 @@ Resource.isOrThrow = container => {
 
 Resource.empty = Resource.prototype.empty = Resource.prototype["fantasy-land/empty"] = () =>
   Resource("", new Uint8Array([]), 0);
+
+Resource.prototype.equals = Resource.prototype["fantasy-land/equals"] = function (container) {
+
+  return this.rid === container.rid
+    && this.raw.byteLength === container.raw.byteLength
+    && !!(this.raw.reduce(
+      (accumulator, value, index) => accumulator && accumulator[index] == value ? accumulator : false,
+      container.raw
+    ));
+};
 
 Resource.prototype.chain = Resource.prototype["fantasy-land/chain"] = function (unaryFunction) {
 
