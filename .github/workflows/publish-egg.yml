@@ -1,0 +1,25 @@
+name: Publish Egg
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  publish-egg:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: denolib/setup-deno@master
+        with:
+          deno-version: 1.4.2
+      - run: echo ::set-env name=RELEASE_VERSION::${GITHUB_REF#refs/tags/*}
+      - run: deno install -A -f --unstable -n eggs https://x.nest.land/eggs@0.2.3/mod.ts
+      - run: >
+          export PATH="/home/runner/.deno/bin:$PATH"
+          && eggs link ${{ secrets.NESTAPIKEY }}
+          && eggs publish functional-io
+          --description "IO methods as valid Task monads perfect to write great point-free software in JavaScript that is compatible with most modern browsers and Deno."
+          --version ${{ env.RELEASE_VERSION }}
+          --entry ./mod.js
+          --files ./README.md ./mod.js ./mod.ts ./library/**/*
+          --no-check-all

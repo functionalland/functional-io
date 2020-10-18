@@ -6,9 +6,13 @@ import {
   move as _move
 } from "https://deno.land/std@0.70.0/fs/mod.ts";
 import { curry } from "https://x.nest.land/ramda@0.27.0/source/index.js";
-import Either from "https://deno.land/x/functional@v0.5.4/Either.js"
-import Task from "https://deno.land/x/functional@v0.5.4/Task.js"
-import { Buffer, coerceAsReader, coerceAsWriter, Directory, File, Resource } from "./types.js";
+import Either from "https://deno.land/x/functional@v1.0.0/library/Either.js"
+import Task from "https://deno.land/x/functional@v1.0.0/library/Task.js"
+import Buffer from "./Buffer.js";
+import Directory from "./Directory.js";
+import File from "./File.js";
+import Resource from "./Resource.js";
+import { coerceAsReader, coerceAsWriter } from "./utilities.js";
 
 // chdir :: Directory a -> Task e Directory a
 export const chdir = directory => Directory.isOrThrow(directory)

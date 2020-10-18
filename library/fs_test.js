@@ -17,8 +17,8 @@ import {
   emptyDir as _emptyDir,
   ensureDir as _ensureDir
 } from "https://deno.land/std@0.70.0/fs/mod.ts";
-import Either from "https://deno.land/x/functional@v0.5.4/Either.js"
-import Task from "https://deno.land/x/functional@v0.5.4/Task.js"
+import Either from "https://deno.land/x/functional@v1.0.0/library/Either.js"
+import Task from "https://deno.land/x/functional@v1.0.0/library/Task.js"
 import {
   chdir,
   chmod,
@@ -43,9 +43,11 @@ import {
   writeAll,
   writeFile
 } from "../library/fs.js"
-import { Buffer, Directory, File } from "../library/types.js";
+import Buffer from "./Buffer.js";
+import Directory from "./Directory.js";
+import File from "./File.js";
 
-import { $$value } from "https://deno.land/x/functional@v0.5.4/Symbols.js";
+import { $$value } from "https://deno.land/x/functional@v1.0.0/library/Symbols.js";
 
 Deno.test(
   "Integration: chdir",
@@ -840,3 +842,16 @@ Deno.test(
   }
 );
 
+import Response from "./Response.js";
+
+Deno.test(
+  "Scenario 4",
+  async () => {
+    const container = compose(
+      lift(Response.OK({ ["Content-Type"]: "application/json" })),
+      _ => Task.of(new Uint8Array([ 65, 66, 67, 68, 69 ]))
+    )(File.fromPath(`${Deno.cwd()}/hoge`));
+
+    assert((await container.run()).extract().headers.status === 200);
+  }
+)
