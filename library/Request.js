@@ -52,7 +52,7 @@ Request.isOrThrow = container => {
   else throw new Error(`Expected a Request but got a "${container[$$type] || typeof container}"`);
 };
 
-Request.DELETE = url => Request(
+Request.DELETE = Request.delete = url => Request(
   {
     cache: "default",
     headers: {},
@@ -63,7 +63,7 @@ Request.DELETE = url => Request(
   new Uint8Array([])
 );
 
-Request.GET = url => Request(
+Request.GET = Request.get = url => Request(
   {
     cache: "default",
     headers: {},
@@ -74,7 +74,7 @@ Request.GET = url => Request(
   new Uint8Array([])
 );
 
-Request.POST = curry(
+Request.POST = Request.post = curry(
   (url, buffer) => Request(
     {
       cache: "default",
@@ -89,7 +89,7 @@ Request.POST = curry(
   )
 );
 
-Request.PUT = curry(
+Request.PUT = Request.put = curry(
   (url, buffer) => Request(
     {
       cache: "default",
