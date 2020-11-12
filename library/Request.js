@@ -75,7 +75,7 @@ Request.GET = Request.get = url => Request(
 );
 
 Request.POST = Request.post = curry(
-  (url, buffer) => Request(
+  (url, _buffer) => Request(
     {
       cache: "default",
       headers: {
@@ -85,12 +85,12 @@ Request.POST = Request.post = curry(
       mode: "cors",
       url
     },
-    buffer.raw
+    _buffer
   )
 );
 
 Request.PUT = Request.put = curry(
-  (url, buffer) => Request(
+  (url, _buffer) => Request(
     {
       cache: "default",
       headers: {
@@ -100,7 +100,7 @@ Request.PUT = Request.put = curry(
       mode: "cors",
       url
     },
-    buffer.raw
+    _buffer
   )
 );
 
