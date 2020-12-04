@@ -4,15 +4,15 @@ import {
   ensureSymlink as _ensureSymlink,
   exists as _exists,
   move as _move
-} from "https://deno.land/std@0.70.0/fs/mod.ts";
-import { curry } from "https://x.nest.land/ramda@0.27.0/source/index.js";
-import Either from "https://deno.land/x/functional@v1.0.0/library/Either.js"
-import Task from "https://deno.land/x/functional@v1.0.0/library/Task.js"
+} from "https://deno.land/std@0.79.0/fs/mod.ts";
+import { compose, curry } from "https://x.nest.land/ramda@0.27.0/source/index.js";
+import Either from "https://deno.land/x/functional@v1.2.1/library/Either.js"
+import Task from "https://deno.land/x/functional@v1.2.1/library/Task.js"
 import Buffer from "./Buffer.js";
 import Directory from "./Directory.js";
 import File from "./File.js";
 import Resource from "./Resource.js";
-import { coerceAsReader, coerceAsWriter } from "./utilities.js";
+import { coerceAsReader, coerceAsWriter, factorizeUint8Array } from "./utilities.js";
 
 // chdir :: Directory a -> Task e Directory a
 export const chdir = directory => Directory.isOrThrow(directory)
@@ -32,10 +32,10 @@ export const chown = curry(
       .map(_ => File(file.path, file.raw, file.rid))
 );
 
-// close :: File a -> Task e File a
-export const close = file => File.isOrThrow(file)
-  && Task.wrap(_ => Deno.close(file.rid) || Promise.resolve(undefined))
-    .map(_ => File(file.path, file.raw, file.rid));
+// close :: Resource a -> Task e Resource a
+export const close = resource => Resource.isOrThrow(resource)
+  && Task.wrap(_ => Deno.close(resource.rid) || Promise.resolve(undefined))
+    .map(_ => resource.constructor.from({ ...resource }));
 
 // copy :: Options -> Buffer a -> Buffer b -> Task e Buffer a
 export const copy = curry(
@@ -75,18 +75,18 @@ export const ensureSymlink = directory => Directory.isOrThrow(directory)
   && Task.wrap(_ => _ensureSymlink(directory.path))
   .map(_ => Directory(directory.path));
 
-// exists :: Location a -> Task null Location a
-export const exists = location => {
-  if (!Directory.is(location) && !File.is(location)) {
-    throw new Error(`Expected a Directory or a File but got a "${typeof location}"`);
+// exists :: URL a -> Task null URL a
+export const exists = url => {
+  if (!Directory.is(url) && !File.is(url)) {
+    throw new Error(`Expected a Directory or a File but got a "${typeof url}"`);
   }
 
-  return Task.wrap(_ => _exists(location.path))
+  return Task.wrap(_ => _exists(url.path))
     .map(
       fileExists => {
         if (!fileExists) return Either.Left(null);
 
-        return location.constructor.from({ ...location });
+        return url.constructor.from({ ...url });
       }
     )
 };
@@ -98,11 +98,11 @@ export const mkdir = curry(
       .map(_ => Directory(directory.path))
 );
 
-// move :: Options -> String -> Location a -> Task e Location b
+// move :: Options -> String -> URL a -> Task e URL b
 export const move = curry(
-  (options, destinationPath, location) => location.hasOwnProperty("path")
-    && Task.wrap(_ => _move(location.path, destinationPath))
-    .map(_ => location.constructor.from({ ...location, path: destinationPath }))
+  (options, destinationPath, url) => url.hasOwnProperty("path")
+    && Task.wrap(_ => _move(url.path, destinationPath))
+    .map(_ => url.constructor.from({ ...url, path: destinationPath }))
 );
 
 // open :: Options -> File a -> Task e File a
@@ -121,6 +121,34 @@ export const read = resource => {
       .map(_ => resource.constructor.from({ ...resource, raw: _buffer }))
 };
 
+// readLine :: Resource a -> Task e Resource a
+export const readLine = resource => Task.wrap(async _ => {
+  let _accumulatorBuffer = new Uint8Array(1024);
+  let index = 0;
+  let _buffer = new Uint8Array(1);
+  let reachedCL = false;
+
+  while (await Deno.read(resource.rid, _buffer)) {
+    _accumulatorBuffer[index++] = _buffer[0];
+    if (reachedCL && _buffer[0] === 10) break;
+    reachedCL = _buffer[0] === 13;
+    _buffer = new Uint8Array(1);
+  }
+
+  return resource.constructor.from({ ...resource, raw: _accumulatorBuffer.slice(0, index) });
+});
+
+// readNBytes :: Number -> Resource a -> Task e Resource a
+export const readNBytes = curry(
+  compose(
+    read,
+    (n, resource) => resource.constructor.from({ ...resource, raw: factorizeUint8Array(n) })
+  )
+);
+
+// readOneByte :: Resource a -> Task e Resource a
+export const readOneByte = readNBytes(1);
+
 // readAll :: Resource a -> Task e Resource a
 export const readAll = resource => Resource.isOrThrow(resource)
   && Task.wrap(_ => Deno.readAll(coerceAsReader(resource)))
@@ -131,18 +159,18 @@ export const readFile = file => File.isOrThrow(file)
   && Task.wrap(_ => Deno.readFile(file.path))
     .map(_buffer => File(file.path, _buffer, file.rid));
 
-// remove :: Options -> Location a -> Task e Location a
+// remove :: Options -> URL a -> Task e URL a
 export const remove = curry(
-  (options, location) => location.hasOwnProperty("path")
-    && Task.wrap(_ => Deno.remove(location.path, options))
-      .map(_ => location.constructor.from({ ...location }))
+  (options, url) => url.hasOwnProperty("path")
+    && Task.wrap(_ => Deno.remove(url.path, options))
+      .map(_ => url.constructor.from({ ...url }))
 );
 
-// rename :: String -> Location a -> Task e Location b
+// rename :: String -> URL a -> Task e URL b
 export const rename = curry(
-  (destinationPath, location) => location.hasOwnProperty("path")
-    && Task.wrap(_ => Deno.rename(location.path, destinationPath))
-      .map(_ => location.constructor.from({ ...location, path: destinationPath }))
+  (destinationPath, url) => url.hasOwnProperty("path")
+    && Task.wrap(_ => Deno.rename(url.path, destinationPath))
+      .map(_ => url.constructor.from({ ...url, path: destinationPath }))
 );
 
 // write :: Resource a -> Task e Resource a
@@ -164,3 +192,4 @@ export const writeFile = curry(
     && Task.wrap(_ => Deno.writeFile(file.path, file.raw, options))
       .map(_ => file.constructor.from({ ...file }))
 );
+

@@ -1,7 +1,7 @@
-import { factorizeType } from "https://deno.land/x/functional@v1.0.0/library/factories.js";
-import Task from "https://deno.land/x/functional@v1.0.0/library/Task.js";
+import { factorizeType } from "https://deno.land/x/functional@v1.2.1/library/factories.js";
+import Task from "https://deno.land/x/functional@v1.2.1/library/Task.js";
 
-import { $$type } from "https://deno.land/x/functional@v1.0.0/library/Symbols.js";
+import { $$type } from "https://deno.land/x/functional@v1.2.1/library/Symbols.js";
 
 /**
  * The `URL` type represents an URL; either of a location on the file system or on a remote server.

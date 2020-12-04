@@ -1,9 +1,9 @@
-import { assert } from "https://deno.land/std@0.70.0/testing/asserts.ts";
-import { serve } from "https://deno.land/std@0.74.0/http/server.ts";
+import { assert } from "https://deno.land/std@0.79.0/testing/asserts.ts";
+import { serve } from "https://deno.land/std@0.79.0/http/server.ts";
 import { fetch } from "./browser_safe.js";
 
-import Either from "https://deno.land/x/functional@v1.0.0/library/Either.js";
-import Task from "https://deno.land/x/functional@v1.0.0/library/Task.js";
+import Either from "https://deno.land/x/functional@v1.2.1/library/Either.js";
+import Task from "https://deno.land/x/functional@v1.2.1/library/Task.js";
 import Request from "./Request.js";
 
 const startAsyncIterator = async (state, server, callback) => {

@@ -1,8 +1,7 @@
-import { factorizeType } from "https://deno.land/x/functional@v1.0.0/library/factories.js";
-import { $$type } from "https://deno.land/x/functional@v1.0.0/library/Symbols.js";
-import Task from "https://deno.land/x/functional@v1.0.0/library/Task.js";
-
-export const Buffer = factorizeType("Buffer", [ "raw" ]);
+import { curry } from "https://x.nest.land/ramda@0.27.0/source/index.js";
+import { factorizeType } from "https://deno.land/x/functional@v1.2.1/library/factories.js";
+import { $$type } from "https://deno.land/x/functional@v1.2.1/library/Symbols.js";
+import Task from "https://deno.land/x/functional@v1.2.1/library/Task.js";
 
 /**
  * The `Buffer` is the most basic type; it only has one attribute which is a typed array named "raw".
@@ -21,6 +20,8 @@ export const Buffer = factorizeType("Buffer", [ "raw" ]);
  * assert(Buffer.is(buffer));
  * ```
  */
+
+export const Buffer = factorizeType("Buffer", [ "raw" ]);
 
 Buffer.prototype.ap = Buffer.prototype["fantasy-land/ap"] = function (container) {
 
@@ -91,5 +92,7 @@ Buffer.prototype.map = Buffer.prototype["fantasy-land/map"] = function (unaryFun
 };
 
 Buffer.of = Buffer.prototype.of = Buffer.prototype["fantasy-land/of"] = buffer => Buffer(buffer);
+
+export const factorizeBuffer = curry(Buffer);
 
 export default Buffer;

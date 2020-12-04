@@ -12,13 +12,13 @@ import {
   replace,
   trim
 } from "https://x.nest.land/ramda@0.27.0/source/index.js";
-import { assert, assertEquals } from "https://deno.land/std@0.70.0/testing/asserts.ts";
+import { assert, assertEquals } from "https://deno.land/std@0.79.0/testing/asserts.ts";
 import {
   emptyDir as _emptyDir,
   ensureDir as _ensureDir
-} from "https://deno.land/std@0.70.0/fs/mod.ts";
-import Either from "https://deno.land/x/functional@v1.0.0/library/Either.js"
-import Task from "https://deno.land/x/functional@v1.0.0/library/Task.js"
+} from "https://deno.land/std@0.79.0/fs/mod.ts";
+import Either from "https://deno.land/x/functional@v1.2.1/library/Either.js"
+import Task from "https://deno.land/x/functional@v1.2.1/library/Task.js"
 import {
   chdir,
   chmod,
@@ -37,6 +37,7 @@ import {
   read,
   readAll,
   readFile,
+  readNBytes,
   remove,
   rename,
   write,
@@ -47,7 +48,7 @@ import Buffer from "./Buffer.js";
 import Directory from "./Directory.js";
 import File from "./File.js";
 
-import { $$value } from "https://deno.land/x/functional@v1.0.0/library/Symbols.js";
+import { $$value } from "https://deno.land/x/functional@v1.2.1/library/Symbols.js";
 
 Deno.test(
   "Integration: chdir",
@@ -497,6 +498,32 @@ Deno.test(
     const _file = await Deno.open(`${Deno.cwd()}/dump/hoge`, { read: true, write: true });
 
     const containerA = readAll(File(`${Deno.cwd()}/dump/hoge`, new Uint8Array([]), _file.rid));
+    const promise = containerA.run();
+
+    assert(Task.is(containerA));
+    assert(promise instanceof Promise);
+
+    const containerB = await promise;
+
+    assert(Either.Right.is(containerB));
+    assertEquals(
+      containerB.toString(),
+      `Either.Right(File("${Deno.cwd()}/dump/hoge", 65,66,67,68,69, ${_file.rid}))`
+    );
+
+    await Deno.remove(`${Deno.cwd()}/dump/hoge`);
+    Deno.close(_file.rid);
+  }
+);
+
+Deno.test(
+  "Integration: readNBytes",
+  async () => {
+    await _ensureDir(`${Deno.cwd()}/dump`);
+    await Deno.writeTextFile(`${Deno.cwd()}/dump/hoge`, "ABCDE");
+    const _file = await Deno.open(`${Deno.cwd()}/dump/hoge`, { read: true, write: true });
+
+    const containerA = readNBytes(5, File(`${Deno.cwd()}/dump/hoge`, new Uint8Array([]), _file.rid));
     const promise = containerA.run();
 
     assert(Task.is(containerA));

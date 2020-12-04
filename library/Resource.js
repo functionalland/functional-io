@@ -1,7 +1,8 @@
-import { factorizeType } from "https://deno.land/x/functional@v1.0.0/library/factories.js";
-import Task from "https://deno.land/x/functional@v1.0.0/library/Task.js";
+import { curry } from "https://x.nest.land/ramda@0.27.0/source/index.js";
+import { factorizeType } from "https://deno.land/x/functional@v1.2.1/library/factories.js";
+import Task from "https://deno.land/x/functional@v1.2.1/library/Task.js";
 
-import { $$type } from "https://deno.land/x/functional@v1.0.0/library/Symbols.js";
+import { $$type } from "https://deno.land/x/functional@v1.2.1/library/Symbols.js";
 
 /**
  * The `Resource` type extends the `Buffer` type. It represents a system resource with a handle, eg: STDOUT, STDIN or a
@@ -102,5 +103,7 @@ Resource.prototype.map = Resource.prototype["fantasy-land/map"] = function (unar
 };
 
 Resource.of = Resource.prototype.of = Resource.prototype["fantasy-land/of"] = raw => Resource(raw, 0);
+
+export const factorizeResource = curry(Resource);
 
 export default Resource;

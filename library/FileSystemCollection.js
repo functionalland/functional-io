@@ -1,6 +1,6 @@
-import { factorizeType } from "https://deno.land/x/functional@v1.0.0/library/factories.js";
+import { factorizeType } from "https://deno.land/x/functional@v1.2.1/library/factories.js";
 
-import { $$value } from "https://deno.land/x/functional@v1.0.0/library/Symbols.js";
+import { $$value } from "https://deno.land/x/functional@v1.2.1/library/Symbols.js";
 
 /**
  * The `FileSystemCollection` is represents a collection of `Location`, namely of `Directory` and `File`. This of it

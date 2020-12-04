@@ -1,6 +1,6 @@
 import { apply, lift } from "https://x.nest.land/ramda@0.27.0/source/index.js";
 
-import Task from "https://deno.land/x/functional@v1.0.0/library/Task.js";
+import Task from "https://deno.land/x/functional@v1.2.1/library/Task.js";
 
 import Request from "./Request.js";
 import Response from "./Response.js";

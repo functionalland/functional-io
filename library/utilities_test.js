@@ -1,7 +1,7 @@
-import { assertEquals } from "https://deno.land/std@0.70.0/testing/asserts.ts";
+import { assertEquals } from "https://deno.land/std@0.79.0/testing/asserts.ts";
 
 import Buffer from "./Buffer.js";
-import { coerceAsReader, coerceAsWriter } from "./utilities.js";
+import { coerceAsReader, coerceAsWriter, findCLRFIndex, splitCLRF, trimCRLF } from "./utilities.js";
 
 Deno.test(
   "coerceAsReader",
@@ -122,5 +122,79 @@ Deno.test(
     assertEquals(promiseF, Promise.resolve(5));
     assertEquals(promiseG, Promise.resolve(5));
     assertEquals(promiseH, Promise.resolve(5));
+  }
+);
+
+Deno.test(
+  "findCLRFIndex",
+  () => {
+    assertEquals(
+      findCLRFIndex(new Uint8Array([ 104, 111, 103, 101, 13, 10 ])),
+      6
+    );
+
+    assertEquals(
+      findCLRFIndex(new Uint8Array([ 104, 111, 103, 101, 13, 10, 104, 111, 103, 101, 13, 10 ])),
+      6
+    );
+
+    assertEquals(
+      findCLRFIndex(new Uint8Array([ 104, 111, 103, 101, 13, 104, 111, 103, 101 ])),
+      -1
+    );
+
+    assertEquals(
+      findCLRFIndex(new Uint8Array([ 104, 111, 103, 101, 10, 104, 111, 103, 101 ])),
+      -1
+    );
+  }
+);
+
+Deno.test(
+  "splitCLRF",
+  () => {
+    assertEquals(
+      splitCLRF(new Uint8Array([ 104, 111, 103, 101, 13, 10 ])),
+      [
+        new Uint8Array([ 104, 111, 103, 101, 13, 10 ])
+      ]
+    );
+
+    assertEquals(
+      splitCLRF(new Uint8Array([ 104, 111, 103, 101, 13, 10, 104, 111, 103, 101, 13, 10 ])),
+      [
+        new Uint8Array([ 104, 111, 103, 101, 13, 10 ]),
+        new Uint8Array([ 104, 111, 103, 101, 13, 10 ])
+      ]
+    );
+
+    assertEquals(
+      splitCLRF(new Uint8Array([ 104, 111, 103, 101, 13, 104, 111, 103, 101 ])),
+      [
+        new Uint8Array([ 104, 111, 103, 101, 13, 104, 111, 103, 101 ])
+      ]
+    );
+
+    assertEquals(
+      splitCLRF(new Uint8Array([ 104, 111, 103, 101, 10, 104, 111, 103, 101 ])),
+      [
+        new Uint8Array([ 104, 111, 103, 101, 10, 104, 111, 103, 101 ])
+      ]
+    );
+  }
+);
+
+Deno.test(
+  "trimCRLF",
+  () => {
+    assertEquals(
+      trimCRLF(new Uint8Array([ 104, 111, 103, 101, 13, 10 ])),
+      new Uint8Array([ 104, 111, 103, 101 ])
+    );
+
+    assertEquals(
+      trimCRLF(new Uint8Array([ 104, 111, 103, 101 ])),
+      new Uint8Array([ 104, 111, 103, 101 ])
+    );
   }
 );
