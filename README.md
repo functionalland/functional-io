@@ -1,6 +1,7 @@
-# Functional Deno IO
+<img src=".github/fl-word_art-io-reverse.svg" alt="Functional IO" width="450" />
 
-Deno IO methods as valid Task monads perfect to write great point-free software in JavaScript.
+IO methods as valid Task monads perfect to write great point-free software in JavaScript that is compatible with most 
+modern browsers and Deno.
 
 [![deno land](http://img.shields.io/badge/available%20on-deno.land/x-lightgrey.svg?logo=deno&labelColor=black)](https://deno.land/x/functional_io@v1.0.0)
 [![deno version](https://img.shields.io/badge/deno-^1.5.4-lightgrey?logo=deno)](https://github.com/denoland/deno)

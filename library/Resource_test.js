@@ -70,7 +70,7 @@ Deno.test(
   }
 );
 
-/**
+/*
  * Resource Semigroup algebra law "Left identity" is not respected because the rid can't be modified without using
  * bimap.
  */
