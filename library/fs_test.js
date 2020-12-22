@@ -1,24 +1,36 @@
 import {
+  __,
+  ap,
   compose,
   concat,
   converge,
   chain,
   curry,
   flip,
+  head,
   join,
   lift,
   map,
   match,
+  path,
+  prop,
   replace,
-  trim
-} from "https://x.nest.land/ramda@0.27.0/source/index.js";
+  trim,
+  useWith
+} from "https://deno.land/x/ramda@v0.27.2/mod.ts";
 import { assert, assertEquals } from "https://deno.land/std@0.79.0/testing/asserts.ts";
 import {
   emptyDir as _emptyDir,
   ensureDir as _ensureDir
 } from "https://deno.land/std@0.79.0/fs/mod.ts";
-import Either from "https://deno.land/x/functional@v1.2.1/library/Either.js"
-import Task from "https://deno.land/x/functional@v1.2.1/library/Task.js"
+import Either from "https://deno.land/x/functional@v1.3.2/library/Either.js"
+import Task from "https://deno.land/x/functional@v1.3.2/library/Task.js";
+import { log, safeExtract } from "https://deno.land/x/functional@v1.3.2/library/utilities.js";
+import Buffer from "./Buffer.js";
+import Directory from "./Directory.js";
+import File, { factorizeFile } from "./File.js";
+import Request from "./Request.js";
+import { fetch } from "./browser_safe.js";
 import {
   chdir,
   chmod,
@@ -43,12 +55,9 @@ import {
   write,
   writeAll,
   writeFile
-} from "../library/fs.js"
-import Buffer from "./Buffer.js";
-import Directory from "./Directory.js";
-import File from "./File.js";
+} from "./fs.js"
 
-import { $$value } from "https://deno.land/x/functional@v1.2.1/library/Symbols.js";
+import { $$value } from "https://deno.land/x/functional@v1.3.2/library/Symbols.js";
 
 Deno.test(
   "Integration: chdir",
@@ -881,4 +890,39 @@ Deno.test(
 
     assert((await container.run()).extract().headers.status === 200);
   }
-)
+);
+
+Deno.test(
+  "Scenario 5",
+  async () => {
+    const fetchBacon = compose(
+      chain(writeFile({})),
+      ap(
+        useWith(
+          lift(factorizeFile(__, __, 0)),
+          [
+            compose(
+              Task.of,
+              name => `${Deno.cwd()}/${name}.html`,
+              prop(1),
+              match(/\?type=([A-Za-z\-]+)/),
+              path([ "headers", "url" ])
+            ),
+            map(prop("raw"))
+          ]
+        ),
+        fetch
+      )
+    );
+
+    const container = await fetchBacon(
+      Request.get("https://baconipsum.com/api/?type=all-meat&paras=3&start-with-lorem=1&format=html")
+    ).run();
+
+    const file = safeExtract("Failed to write file.", container);
+
+    assert(File.is(file));
+
+    await Deno.remove(`${Deno.cwd()}/all-meat.html`);
+  }
+);

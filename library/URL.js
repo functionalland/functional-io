@@ -1,9 +1,11 @@
-import { factorizeType } from "https://deno.land/x/functional@v1.2.1/library/factories.js";
-import Task from "https://deno.land/x/functional@v1.2.1/library/Task.js";
+import { factorizeType } from "https://deno.land/x/functional@v1.3.2/library/factories.js";
+import Task from "https://deno.land/x/functional@v1.3.2/library/Task.js";
 
-import { $$type } from "https://deno.land/x/functional@v1.2.1/library/Symbols.js";
+import { $$type } from "https://deno.land/x/functional@v1.3.2/library/Symbols.js";
 
 /**
+ * ## URL
+ *
  * The `URL` type represents an URL; either of a location on the file system or on a remote server.
  * It has only one attributes: the path of the URL.
  * A `URL` is interoperable with a `File` or a `Directory`.
@@ -51,7 +53,7 @@ URL.prototype.extract = URL.prototype["fantasy-land/extract"] = function () {
 URL.fromPath = path => URL(path);
 
 URL.isOrThrow = container => {
-  if (URL.is(container) || Task.is(container)) return container;
+  if (URL.is(container) || container.hasOwnProperty("path") || Task.is(container)) return container;
   else throw new Error(`Expected a URL but got a "${container[$$type] || typeof container}"`);
 };
 

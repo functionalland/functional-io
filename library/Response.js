@@ -1,8 +1,10 @@
-import { curry } from "https://x.nest.land/ramda@0.27.0/source/index.js";
+import curry from "https://deno.land/x/ramda@v0.27.2/source/curry.js";
 
-import { factorizeSumType } from "https://deno.land/x/functional@v1.2.1/library/factories.js";
+import { factorizeSumType } from "https://deno.land/x/functional@v1.3.2/library/factories.js";
 
 /**
+ * ## Response
+ *
  * The `Response` represent a HTTP response.
  * It has two attributes: the first is an object for the response "header" and the second is a typed array named "raw".
  * The `Response` type is mostly interoperable with `Resource`, `File` and `Request`.

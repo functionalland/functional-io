@@ -1,9 +1,11 @@
-import { curry } from "https://x.nest.land/ramda@0.27.0/source/index.js";
-import { factorizeType } from "https://deno.land/x/functional@v1.2.1/library/factories.js";
-import { $$type } from "https://deno.land/x/functional@v1.2.1/library/Symbols.js";
-import Task from "https://deno.land/x/functional@v1.2.1/library/Task.js";
+import curry from "https://deno.land/x/ramda@v0.27.2/source/curry.js";
+import { factorizeType } from "https://deno.land/x/functional@v1.3.2/library/factories.js";
+import { $$type } from "https://deno.land/x/functional@v1.3.2/library/Symbols.js";
+import Task from "https://deno.land/x/functional@v1.3.2/library/Task.js";
 
 /**
+ * ## Buffer
+ *
  * The `Buffer` is the most basic type; it only has one attribute which is a typed array named "raw".
  * Any type that share the raw attribute is composable with `Buffer` (and each other) and interoperable.
  *
@@ -15,7 +17,9 @@ import Task from "https://deno.land/x/functional@v1.2.1/library/Task.js";
  * ### Example
  *
  * ```js
- * const buffer = Buffer.fromString("Hoge").concat(Buffer.fromString("Fuga"));
+ * import Buffer from "https://deno.land/x/functional_io@v1.1.0/library/Buffer.js";
+ *
+ * const buffer = Buffer.fromString("hoge").concat(Buffer.fromString("fuga"));
  *
  * assert(Buffer.is(buffer));
  * ```

@@ -1,9 +1,11 @@
-import { factorizeType } from "https://deno.land/x/functional@v1.2.1/library/factories.js";
-import Task from "https://deno.land/x/functional@v1.2.1/library/Task.js";
+import { factorizeType } from "https://deno.land/x/functional@v1.3.2/library/factories.js";
+import Task from "https://deno.land/x/functional@v1.3.2/library/Task.js";
 
-import { $$type } from "https://deno.land/x/functional@v1.2.1/library/Symbols.js";
+import { $$type } from "https://deno.land/x/functional@v1.3.2/library/Symbols.js";
 
 /**
+ * ## Directory
+ *
  * The `Directory` type represents a directory on the file system. It is the only type with the same shape as `URL`.
  * It has only one attributes: the path of the directory.
  * A `Directory` is interoperable with a `URL` or a `File`.

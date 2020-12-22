@@ -1,7 +1,15 @@
 import { assertEquals } from "https://deno.land/std@0.79.0/testing/asserts.ts";
 
 import Buffer from "./Buffer.js";
-import { coerceAsReader, coerceAsWriter, findCLRFIndex, splitCLRF, trimCRLF } from "./utilities.js";
+import {
+  coerceAsReader,
+  coerceAsWriter,
+  discardFirstLine,
+  discardNCharacter,
+  findCLRFIndex, getFirstLine, joinCLRF,
+  splitCLRF,
+  trimCRLF
+} from "./utilities.js";
 
 Deno.test(
   "coerceAsReader",
@@ -151,6 +159,66 @@ Deno.test(
 );
 
 Deno.test(
+  "discardFirstLine",
+  () => {
+    assertEquals(
+      discardFirstLine(new Uint8Array([ 104, 111, 103, 101, 13, 10, 104, 111, 103, 101, 13, 10 ])),
+      new Uint8Array([ 104, 111, 103, 101, 13, 10 ])
+    );
+
+    assertEquals(
+      discardFirstLine(new Uint8Array([ 104, 111, 103, 101, 13, 10 ])),
+      new Uint8Array([])
+    );
+  }
+);
+
+Deno.test(
+  "discardNCharacter",
+  () => {
+    assertEquals(
+      discardNCharacter(1, new Uint8Array([ 104, 111, 103, 101, 13, 10 ])),
+      new Uint8Array([ 111, 103, 101, 13, 10 ])
+    );
+  }
+);
+
+Deno.test(
+  "getFirstLine",
+  () => {
+    assertEquals(
+      getFirstLine(new Uint8Array([ 104, 111, 103, 101, 13, 10, 104, 111, 103, 101, 13, 10 ])),
+      new Uint8Array([ 104, 111, 103, 101, 13, 10 ])
+    );
+
+    assertEquals(
+      getFirstLine(new Uint8Array([ 104, 111, 103, 101, 13, 10 ])),
+      new Uint8Array([ 104, 111, 103, 101, 13, 10 ])
+    );
+  }
+);
+
+Deno.test(
+  "joinCLRF",
+  () => {
+    assertEquals(
+      joinCLRF(
+        [
+          new Uint8Array([ 104, 111, 103, 101 ]),
+          new Uint8Array([ 112, 105, 121, 111 ])
+        ]
+      ),
+      new Uint8Array([ 104, 111, 103, 101, 13, 10, 112, 105, 121, 111, 13, 10 ])
+    );
+
+    assertEquals(
+      joinCLRF([ new Uint8Array([ 104, 111, 103, 101 ]) ]),
+      new Uint8Array([ 104, 111, 103, 101, 13, 10 ])
+    );
+  }
+)
+
+Deno.test(
   "splitCLRF",
   () => {
     assertEquals(
@@ -161,24 +229,24 @@ Deno.test(
     );
 
     assertEquals(
-      splitCLRF(new Uint8Array([ 104, 111, 103, 101, 13, 10, 104, 111, 103, 101, 13, 10 ])),
+      splitCLRF(new Uint8Array([ 104, 111, 103, 101, 13, 10, 112, 105, 121, 111, 13, 10 ])),
       [
         new Uint8Array([ 104, 111, 103, 101, 13, 10 ]),
-        new Uint8Array([ 104, 111, 103, 101, 13, 10 ])
+        new Uint8Array([ 112, 105, 121, 111, 13, 10 ])
       ]
     );
 
     assertEquals(
-      splitCLRF(new Uint8Array([ 104, 111, 103, 101, 13, 104, 111, 103, 101 ])),
+      splitCLRF(new Uint8Array([ 104, 111, 103, 101, 13, 112, 105, 121, 111 ])),
       [
-        new Uint8Array([ 104, 111, 103, 101, 13, 104, 111, 103, 101 ])
+        new Uint8Array([ 104, 111, 103, 101, 13, 112, 105, 121, 111 ])
       ]
     );
 
     assertEquals(
-      splitCLRF(new Uint8Array([ 104, 111, 103, 101, 10, 104, 111, 103, 101 ])),
+      splitCLRF(new Uint8Array([ 104, 111, 103, 101, 10, 112, 105, 121, 111 ])),
       [
-        new Uint8Array([ 104, 111, 103, 101, 10, 104, 111, 103, 101 ])
+        new Uint8Array([ 104, 111, 103, 101, 10, 112, 105, 121, 111 ])
       ]
     );
   }
@@ -190,6 +258,21 @@ Deno.test(
     assertEquals(
       trimCRLF(new Uint8Array([ 104, 111, 103, 101, 13, 10 ])),
       new Uint8Array([ 104, 111, 103, 101 ])
+    );
+
+    assertEquals(
+      trimCRLF(new Uint8Array([ 13, 10, 104, 111, 103, 101, 13, 10 ])),
+      new Uint8Array([ 104, 111, 103, 101 ])
+    );
+
+    assertEquals(
+      trimCRLF(new Uint8Array([ 13, 10, 13, 10, 104, 111, 103, 101, 13, 10 ])),
+      new Uint8Array([ 104, 111, 103, 101 ])
+    );
+
+    assertEquals(
+      trimCRLF(new Uint8Array([ 13, 10, 104, 111, 103, 101, 13, 10, 112, 105, 121, 111, 13, 10 ])),
+      new Uint8Array([ 104, 111, 103, 101, 13, 10, 112, 105, 121, 111 ])
     );
 
     assertEquals(

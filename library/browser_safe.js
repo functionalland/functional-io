@@ -1,9 +1,15 @@
-import { apply, lift } from "https://x.nest.land/ramda@0.27.0/source/index.js";
+import apply from "https://deno.land/x/ramda@v0.27.2/source/apply.js";
+import lift from "https://deno.land/x/ramda@v0.27.2/source/lift.js";
 
-import Task from "https://deno.land/x/functional@v1.2.1/library/Task.js";
+import Task from "https://deno.land/x/functional@v1.3.2/library/Task.js";
+import { decodeRaw } from "https://deno.land/x/functional@v1.3.2/library/utilities.js";
 
 import Request from "./Request.js";
 import Response from "./Response.js";
+
+/**
+ * ## Browser safe
+ */
 
 const coerceReadableStreamToUint8Array = async readableStream => {
   let _array = new Uint8Array([]);
@@ -17,7 +23,24 @@ const coerceReadableStreamToUint8Array = async readableStream => {
   });
 }
 
-// fetch :: Request -> Task e Response
+/**
+ * ### `pureFetch`
+ * `Request -> Task e Response`
+ *
+ * Fetches a resource on a local/remote server.
+ *
+ * ```js
+ * import { fetch } from "https://deno.land/x/functional_io@v1.1.0/library/browser-safe.js";
+ *
+ * const containerA = fetch(Request.GET("http://localhost:8000"));
+ *
+ * assert(Task.is(containerA));
+ *
+ * const containerB = await container.run().extract();
+ *
+ * assert(Response.Success.is(containerB));
+ * ```
+ */
 const pureFetch = request => Request.isOrThrow(request)
   && Task.wrap(_ =>
     fetch(
@@ -29,7 +52,7 @@ const pureFetch = request => Request.isOrThrow(request)
           || /^application\/[a-z-\.]*\+*json$/.test(request.headers["Content-Type"])
           || /^text\//.test(request.headers["Content-Type"])
         )
-          ? new TextDecoder().decode(request.raw)
+          ? decodeRaw(request.raw)
           : request.raw
       }
     )

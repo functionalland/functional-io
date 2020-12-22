@@ -1,10 +1,12 @@
-import { curry } from "https://x.nest.land/ramda@0.27.0/source/index.js";
-import { factorizeType } from "https://deno.land/x/functional@v1.2.1/library/factories.js";
-import Task from "https://deno.land/x/functional@v1.2.1/library/Task.js";
+import curry from "https://deno.land/x/ramda@v0.27.2/source/curry.js";
+import { factorizeType } from "https://deno.land/x/functional@v1.3.2/library/factories.js";
+import Task from "https://deno.land/x/functional@v1.3.2/library/Task.js";
 
-import { $$type } from "https://deno.land/x/functional@v1.2.1/library/Symbols.js";
+import { $$type } from "https://deno.land/x/functional@v1.3.2/library/Symbols.js";
 
 /**
+ * ## Resource
+ *
  * The `Resource` type extends the `Buffer` type. It represents a system resource with a handle, eg: STDOUT, STDIN or a
  * file. It has two attributes: the first is a typed array named "raw" and the second is the Resource ID (`rid`).
  * Any type that share the `Resource` attributes is composable and interoperable.

@@ -1,8 +1,10 @@
-import { factorizeType } from "https://deno.land/x/functional@v1.2.1/library/factories.js";
+import { factorizeType } from "https://deno.land/x/functional@v1.3.2/library/factories.js";
 
-import { $$value } from "https://deno.land/x/functional@v1.2.1/library/Symbols.js";
+import { $$value } from "https://deno.land/x/functional@v1.3.2/library/Symbols.js";
 
 /**
+ * ## File System Collection
+ *
  * The `FileSystemCollection` is represents a collection of `Location`, namely of `Directory` and `File`. This of it
  * as an Array for those types.
  *

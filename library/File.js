@@ -1,9 +1,12 @@
-import { factorizeType } from "https://deno.land/x/functional@v1.2.1/library/factories.js";
-import Task from "https://deno.land/x/functional@v1.2.1/library/Task.js";
+import curry from "https://deno.land/x/ramda@v0.27.2/source/curry.js";
+import { factorizeType } from "https://deno.land/x/functional@v1.3.2/library/factories.js";
+import Task from "https://deno.land/x/functional@v1.3.2/library/Task.js";
 
-import { $$type } from "https://deno.land/x/functional@v1.2.1/library/Symbols.js";
+import { $$type } from "https://deno.land/x/functional@v1.3.2/library/Symbols.js";
 
 /**
+ * ## File
+ *
  * The `File` type extends the `Resource` type. It represents a file with a path.
  * It has three attributes: the first is the path of the file, the second is a typed array named "raw" and the last
  * is the Resource ID (`rid`).
@@ -103,5 +106,7 @@ File.prototype.map = File.prototype["fantasy-land/map"] = function (unaryFunctio
 };
 
 File.of = File.prototype.of = File.prototype["fantasy-land/of"] = raw => File("", raw, 0);
+
+export const factorizeFile = curry(File);
 
 export default File;
