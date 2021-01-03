@@ -9,8 +9,8 @@ import {
   slice
 } from "https://deno.land/x/ramda@v0.27.2/mod.ts";
 
-import Pair from "https://deno.land/x/functional@v1.3.2/library/Pair.js";
-import { decodeRaw, encodeText } from "https://deno.land/x/functional@v1.3.2/library/utilities.js";
+import Pair from "https://deno.land/x/functional@v1.3.3/library/Pair.js";
+import { decodeRaw, encodeText } from "https://deno.land/x/functional@v1.3.3/library/utilities.js";
 
 const CHARACTER_CODE_CL = "\r".charCodeAt(0);
 const CHARACTER_CODE_RF = "\n".charCodeAt(0);

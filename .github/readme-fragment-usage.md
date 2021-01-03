@@ -5,8 +5,8 @@ library that implements the [Fantasy-land specifications](https://github.com/fan
 
 ```js
 import { __, ap, chain, compose, lift, map, match, path, prop, useWith } from "https://deno.land/x/ramda@v0.27.2/mod.ts";
-import Task from "https://deno.land/x/functional@v1.3.2/library/Task.js";
-import { safeExtract } from "https://deno.land/x/functional@v1.3.2/library/utilities.js";
+import Task from "https://deno.land/x/functional@v1.3.3/library/Task.js";
+import { safeExtract } from "https://deno.land/x/functional@v1.3.3/library/utilities.js";
 import Request from "https://deno.land/x/functional_io@v1.1.0/library/Request.js";
 import { factorizeFile } from "https://deno.land/x/functional_io@v1.1.0/library/File.js";
 import { fetch } from "https://deno.land/x/functional_io@v1.1.0/library/browser_safe.js";
@@ -49,7 +49,7 @@ assert(File.is(file));
 As a convenience, when using Functional IO in the browser, you can use the **unminified** bundled copy (18KB gzipped).
 
 ```js
-import { Task, safeExtract } from "https://deno.land/x/functional@v1.3.2/functional.js";
+import { Task, safeExtract } from "https://deno.land/x/functional@v1.3.3/functional.js";
 import { Request, Response, fetch } from "https://deno.land/x/functional_io@v1.1.0/functional-io.js";
 
 const container = fetch(

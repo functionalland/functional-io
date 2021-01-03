@@ -1,5 +1,5 @@
 import { Connection } from "./Resource.js";
-import Task from "https://deno.land/x/functional@v1.3.2/library/Task";
+import Task from "https://deno.land/x/functional@v1.3.3/library/Task";
 
 // connect :: Connection a -> Task e Connection a
 export const connect = connection => Connection.isOrThrow(connection)

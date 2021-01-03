@@ -1,8 +1,8 @@
 import curry from "https://deno.land/x/ramda@v0.27.2/source/curry.js";
-import { factorizeType } from "https://deno.land/x/functional@v1.3.2/library/factories.js";
-import Task from "https://deno.land/x/functional@v1.3.2/library/Task.js";
+import { factorizeType } from "https://deno.land/x/functional@v1.3.3/library/factories.js";
+import Task from "https://deno.land/x/functional@v1.3.3/library/Task.js";
 
-import { $$type } from "https://deno.land/x/functional@v1.3.2/library/Symbols.js";
+import { $$type } from "https://deno.land/x/functional@v1.3.3/library/Symbols.js";
 
 /**
  * ## File

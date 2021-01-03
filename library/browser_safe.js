@@ -1,8 +1,8 @@
 import apply from "https://deno.land/x/ramda@v0.27.2/source/apply.js";
 import lift from "https://deno.land/x/ramda@v0.27.2/source/lift.js";
 
-import Task from "https://deno.land/x/functional@v1.3.2/library/Task.js";
-import { decodeRaw } from "https://deno.land/x/functional@v1.3.2/library/utilities.js";
+import Task from "https://deno.land/x/functional@v1.3.3/library/Task.js";
+import { decodeRaw } from "https://deno.land/x/functional@v1.3.3/library/utilities.js";
 
 import Request from "./Request.js";
 import Response from "./Response.js";

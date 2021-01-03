@@ -1,6 +1,6 @@
-import { factorizeType } from "https://deno.land/x/functional@v1.3.2/library/factories.js";
+import { factorizeType } from "https://deno.land/x/functional@v1.3.3/library/factories.js";
 
-import { $$value } from "https://deno.land/x/functional@v1.3.2/library/Symbols.js";
+import { $$value } from "https://deno.land/x/functional@v1.3.3/library/Symbols.js";
 
 /**
  * ## File System Collection

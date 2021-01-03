@@ -1,6 +1,6 @@
 import curry from "https://deno.land/x/ramda@v0.27.2/source/curry.js";
 
-import { factorizeType } from "https://deno.land/x/functional@v1.3.2/library/factories.js";
+import { factorizeType } from "https://deno.land/x/functional@v1.3.3/library/factories.js";
 
 /**
  * ## Request

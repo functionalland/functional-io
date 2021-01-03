@@ -6,8 +6,8 @@ import {
   move as _move
 } from "https://deno.land/std@0.79.0/fs/mod.ts";
 import { compose, curry } from "https://deno.land/x/ramda@v0.27.2/mod.ts";
-import Either from "https://deno.land/x/functional@v1.3.2/library/Either.js"
-import Task from "https://deno.land/x/functional@v1.3.2/library/Task.js"
+import Either from "https://deno.land/x/functional@v1.3.3/library/Either.js"
+import Task from "https://deno.land/x/functional@v1.3.3/library/Task.js"
 import Buffer from "./Buffer.js";
 import Directory from "./Directory.js";
 import File from "./File.js";

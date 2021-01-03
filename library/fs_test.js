@@ -23,9 +23,9 @@ import {
   emptyDir as _emptyDir,
   ensureDir as _ensureDir
 } from "https://deno.land/std@0.79.0/fs/mod.ts";
-import Either from "https://deno.land/x/functional@v1.3.2/library/Either.js"
-import Task from "https://deno.land/x/functional@v1.3.2/library/Task.js";
-import { log, safeExtract } from "https://deno.land/x/functional@v1.3.2/library/utilities.js";
+import Either from "https://deno.land/x/functional@v1.3.3/library/Either.js"
+import Task from "https://deno.land/x/functional@v1.3.3/library/Task.js";
+import { log, safeExtract } from "https://deno.land/x/functional@v1.3.3/library/utilities.js";
 import Buffer from "./Buffer.js";
 import Directory from "./Directory.js";
 import File, { factorizeFile } from "./File.js";
@@ -57,7 +57,7 @@ import {
   writeFile
 } from "./fs.js"
 
-import { $$value } from "https://deno.land/x/functional@v1.3.2/library/Symbols.js";
+import { $$value } from "https://deno.land/x/functional@v1.3.3/library/Symbols.js";
 
 Deno.test(
   "Integration: chdir",
